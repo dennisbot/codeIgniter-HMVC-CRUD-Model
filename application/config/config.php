@@ -14,8 +14,22 @@
 | path to your installation.
 |
 */
-$config['base_url']	= '';
-
+$config['base_url']	= '/agencia/';
+$config['public_url'] = $config['base_url']. 'assets/';
+$config['site_name'] = 'my site name';
+$config['language_attributes'] = 'es-ES';
+$config['site_email'] = 'dennisbot@gmail.com';
+/* bootstrap Assets files */
+$config['bootstrap_js'] = $config['public_url'] . 'bootstrap/js/';
+$config['bootstrap_css'] = $config['public_url'] . 'bootstrap/css/';
+$config['bootstrap_img'] = $config['public_url'] . 'bootstrap/img/';
+/* jquery Assets files */
+$config['base_js'] = $config['public_url'] . 'js/';
+$config['base_css'] = $config['public_url'] . 'css/';
+$config['base_img'] = $config['public_url'] . 'img/';
+$config['base_jquery'] = $config['public_url'] . 'jquery/';
+/* Fonts Awesome Assets files */
+$config['font_awesome_css'] = $config['public_url'] . 'font_awesome/css/';
 /*
 |--------------------------------------------------------------------------
 | Index File
@@ -26,7 +40,7 @@ $config['base_url']	= '';
 | variable so that it is blank.
 |
 */
-$config['index_page'] = 'index.php';
+$config['index_page'] = '';
 
 /*
 |--------------------------------------------------------------------------
@@ -69,7 +83,7 @@ $config['url_suffix'] = '';
 | than english.
 |
 */
-$config['language']	= 'english';
+$config['language']	= 'spanish';
 
 /*
 |--------------------------------------------------------------------------
@@ -222,9 +236,9 @@ $config['cache_path'] = '';
 |
 | If you use the Encryption class or the Session class you
 | MUST set an encryption key.  See the user guide for info.
-|
+| si sopa
 */
-$config['encryption_key'] = '';
+$config['encryption_key'] = 'e7eac539d42b04cfc3244dbc5d37a4e9';
 
 /*
 |--------------------------------------------------------------------------
@@ -360,3 +374,23 @@ $config['proxy_ips'] = '';
 
 /* End of file config.php */
 /* Location: ./application/config/config.php */
+$config['results_per_page'] = 5;
+$config['pagination_style'] = array(
+	'next_link' => 'Siguiente >',
+    'next_tag_open' => '<li>',
+    'next_tag_close' => '</li>',
+    'prev_link' => '< Anterior',
+    'prev_tag_open' => '<li>',
+    'prev_tag_close' => '</li>',
+    'cur_tag_open' => '<li class="active"><a>',
+    'cur_tag_close' => '</a></li>',
+    'num_links' => 1,
+    'num_tag_open' => '<li>',
+    'num_tag_close' => '</li>',
+    'first_link' => 'Primero',
+    'first_tag_open' => '<li>',
+    'first_tag_close' => '</li>',
+    'last_link' => '&Uacute;ltimo',
+    'last_tag_open' => '<li>',
+    'last_tag_close' => '</li>'
+);

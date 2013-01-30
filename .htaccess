@@ -1,0 +1,17 @@
+<IfModule mod_rewrite.c>
+RewriteEngine on
+#RewriteBase /
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond $1 !^(index\.php|images|robots\.txt)
+RewriteRule ^(.*)$ index.php/$1 [L]
+</IfModule>
+
+<IfModule !mod_rewrite.c>
+ # If we dont have mod_rewrite installed, all 404s
+ # can be sent to index.php, and everything works as normal.
+ # Submitted by: ElliotHaughin
+
+ErrorDocument 404 /index.php
+</IfModule>

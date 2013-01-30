@@ -3,24 +3,24 @@
 /**
  * CodeIgniter CRUD Model 2
  * A base model providing CRUD, pagination and validation.
- * 
+ *
  * Install this file as application/core/MY_Model.php
- * 
+ *
  * @package	CodeIgniter
  * @author		Jesse Terry
  * @copyright	Copyright (c) 2012, Jesse Terry
  * @link		http://developer13.com
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,7 +28,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- * 
+ *
  */
 class MY_Model extends CI_Model {
 
@@ -51,7 +51,8 @@ class MY_Model extends CI_Model {
 		'or_having', 'order_by', 'limit'
 	);
 	public $user_funcs = array();
-
+	public $order_by;
+	public $order = 'asc';
 	public function __call($name, $arguments)
 	{
         call_user_func_array(array($this->db, $name), $arguments);
@@ -72,15 +73,15 @@ class MY_Model extends CI_Model {
 		}
 
 		$this->query = $this->db->get($this->table);
-		
+
 		$this->user_funcs = array();
-		
+
 		return $this;
 	}
 
 	/**
 	 * Query builder which listens to methods in child model.
-	 * @param type $exclude 
+	 * @param type $exclude
 	 */
 	private function set_defaults($exclude = array())
 	{
@@ -117,10 +118,7 @@ class MY_Model extends CI_Model {
 
 		$this->set_defaults();
 
-		$this->total_rows = $this->db->get($this->table)->num_rows();
-
 		$uri_segments = $this->uri->segment_array();
-
 		foreach ($uri_segments as $key => $segment)
 		{
 			if ($segment == 'page')
@@ -137,6 +135,8 @@ class MY_Model extends CI_Model {
 				$base_url = site_url(implode('/', $uri_segments) . '/page/');
 			}
 		}
+
+		$this->total_rows = $this->get($this->table)->num_rows();
 
 		if (!$uri_segment)
 		{
@@ -163,18 +163,18 @@ class MY_Model extends CI_Model {
 		 * Done with pagination, now on to the paged results
 		 */
 		$this->set_defaults();
-		
+
         foreach ($this->user_funcs as $func)
         {
             call_user_func_array(array($this->db, $func[0]), $func[1]);
         }
 
-		$this->db->limit($per_page, $offset);
 
+		$this->db->limit($per_page, $offset);
 		$this->query = $this->db->get($this->table);
-		
+
 		$this->user_funcs = array();
-		
+
 		return $this;
 	}
 
@@ -302,7 +302,7 @@ class MY_Model extends CI_Model {
 
 	/**
 	 * Used to retrieve record by ID and populate $this->form_values.
-	 * @param int $id 
+	 * @param int $id
 	 */
 	public function prep_form($id = NULL)
 	{
@@ -310,7 +310,6 @@ class MY_Model extends CI_Model {
 		{
 			$this->db->where($this->primary_key, $id);
 			$row = $this->db->get($this->table)->row();
-
 			foreach ($row as $key => $value)
 			{
 				$this->form_values[$key] = $value;
@@ -343,9 +342,11 @@ class MY_Model extends CI_Model {
 
 			$this->load->library('form_validation');
 
+			// $this->form_validation->set_error_delimiters('<div class="error">', '</div>');
+
 			$this->form_validation->set_rules($this->$validation_rules());
 
-			$run = $this->form_validation->run();
+			$run = $this->form_validation->run($this);
 
 			$this->validation_errors = validation_errors();
 
@@ -356,18 +357,18 @@ class MY_Model extends CI_Model {
 	/**
 	 * Returns the assigned form value to a form input element.
 	 * @param type $key
-	 * @return type 
+	 * @return type
 	 */
 	public function form_value($key)
 	{
 		return (isset($this->form_values[$key])) ? $this->form_values[$key] : '';
 	}
-	
+
 	public function set_form_value($key, $value)
 	{
 		$this->form_values[$key] = $value;
 	}
-	
+
 }
 
 ?>

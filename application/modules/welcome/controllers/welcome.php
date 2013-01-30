@@ -7,10 +7,10 @@ class Welcome extends MX_Controller {
 	 *
 	 * Maps to the following URL
 	 * 		http://example.com/index.php/welcome
-	 *	- or -  
+	 *	- or -
 	 * 		http://example.com/index.php/welcome/index
 	 *	- or -
-	 * Since this controller is set as the default controller in 
+	 * Since this controller is set as the default controller in
 	 * config/routes.php, it's displayed at http://example.com/
 	 *
 	 * So any other public methods not prefixed with an underscore will
@@ -19,7 +19,9 @@ class Welcome extends MX_Controller {
 	 */
 	public function index()
 	{
-		$this->load->view('welcome_message');
+		$this->load->model('empleados');
+		$empleados = $this->empleados->get()->result();
+		$this->load->view('empleados_view', array('empleados' => $empleados));
 	}
 }
 

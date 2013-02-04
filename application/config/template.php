@@ -61,7 +61,6 @@ Lo utilizan: pagina de inicio, ..
 $template['default']['template'] = 'template';
 $template['default']['regions'] = array(
 		'header_title',
-		'system_messages',
 		'title',
 		'content',
 );

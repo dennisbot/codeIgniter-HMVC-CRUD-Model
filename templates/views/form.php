@@ -1,10 +1,14 @@
-<div class="padded" style="margin: 15px auto;width: 50%;padding: 10px;border: 1px solid #50AAC2;text-align: center;">
-<form method="post" action="<?php echo site_url($this->uri->uri_string()); ?>">
+<div class="padded form-agregar">
+<?php $this->load->view('dashboard/system_messages'); ?>
+<form class="form-horizontal" method="post" action="<?php echo site_url($this->uri->uri_string()); ?>">
 
 	{fields_form}
-	<input type="submit" id="btn_cancel" class="btn btn-danger" name="btn_cancel" value="<?php echo $this->lang->line('cancel'); ?>" />
-	<input type="submit" id="btn_submit" class="btn btn-success" name="btn_submit" value="<?php echo $this->lang->line('submit'); ?>" />
-
+	<div class="control-group">
+		<div class="controls">
+			<input type="submit" class="btn btn-danger" name="btn_cancel" value="<?php echo $this->lang->line('cancel'); ?>" />
+			<input type="submit" class="btn btn-success" name="btn_submit" value="<?php echo $this->lang->line('submit'); ?>" />
+		</div>
+	</div>
 </form>
 <div class="controles">
 	<ul class="nav nav-list">

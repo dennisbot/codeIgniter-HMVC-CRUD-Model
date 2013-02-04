@@ -1,7 +1,8 @@
 <div class="centered-text" style="width: 60%; margin: 0px auto; padding: 15px;">
+<?php $this->load->view('dashboard/system_messages'); ?>
 <?php $this->load->view('dashboard/btn_add', array('btn_value'=> 'agregar {entity}')); ?>
 </div>
-<table class="table table-striped table-hover" style="margin: 0px auto;">
+<table class="table table-striped table-hover form-agregar" style="margin: 0px auto;">
 	<tr>
 		{headers}
 	</tr>

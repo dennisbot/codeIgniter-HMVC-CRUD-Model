@@ -342,7 +342,7 @@ class MY_Model extends CI_Model {
 
 			$this->load->library('form_validation');
 
-			// $this->form_validation->set_error_delimiters('<div class="error">', '</div>');
+			$this->form_validation->set_error_delimiters('<li class="error">', '</li>');
 
 			$this->form_validation->set_rules($this->$validation_rules());
 

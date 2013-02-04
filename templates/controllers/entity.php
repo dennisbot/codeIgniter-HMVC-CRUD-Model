@@ -15,10 +15,10 @@ class {controller_name} extends MX_Controller {
 
     public function index() {
         $this->load->model('{model_name_table}');
-        $this->mdl_empleados->default_limit = $this->config->item('results_per_page');
+        $this->{model_name}->default_limit = $this->config->item('results_per_page');
 
-        $this->mdl_empleados->order_by = uri_assoc('order_by');
-        $this->mdl_empleados->order = uri_assoc('order');
+        $this->{model_name}->order_by = uri_assoc('order_by');
+        $this->{model_name}->order = uri_assoc('order');
 
         $data = array(
             '{entity}s' => $this->{model_name}->paginate()->result(),
@@ -45,14 +45,13 @@ class {controller_name} extends MX_Controller {
         $this->template->write('header_title', 'Listado de {controller_name}');
         $this->template->write('title', 'Listado de {controller_name}');
         $this->template->write_view('content', 'index', $data);
-        //$this->template->write_view('system_messages', 'dashboard/system_messages');
         $this->template->render();
     }
 
     public function form() {
         ${identity} = uri_assoc('{identity}');
         if ($this->{model_name}->run_validation()) {
-            $idempleado = $this->{model_name}->save(${identity});
+            ${identity} = $this->{model_name}->save(${identity});
             /*redirect('{entity}/form/{identity}/' . ${identity});*/
             redirect('{entity}/index');
 
@@ -66,7 +65,6 @@ class {controller_name} extends MX_Controller {
             $this->template->write('header_title', 'Administrar {controller_name}');
             $this->template->write('title', 'Administrar {controller_name}');
             $this->template->write_view('content', 'form');
-            $this->template->write_view('system_messages', 'dashboard/system_messages');
             $this->template->render();
         }
     }

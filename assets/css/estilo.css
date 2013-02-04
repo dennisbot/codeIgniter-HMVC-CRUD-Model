@@ -135,12 +135,12 @@ color: #fff;
 #box-errors{margin: 14px 0 10px 10px;font-family: Helvetica;background: #F4BFBF;width: 400px;padding: 6px}
 #box-errors span{font-weight: bold;font-size: 12px}
 #box-errors ul{margin-top: 10px}
-#box-errors li.errorli{line-height: 20px;color: #6B0505;font-size: 12px;font-family: Helvetica}
-.info, .warning, .success, .error {padding:15px 10px 15px 50px;	margin-bottom: 10px;}
+#box-errors li.error_modificado li{line-height: 20px;color: #6B0505;font-size: 12px;font-family: Helvetica}
+.info, .warning, .success, .error_modificado {padding:15px 10px 15px 50px;	margin-bottom: 10px;}
 .info{background:#444444;color:#FFFFFF;}
 .warning{background:#FFFFCC;color:#222222;}
 .success{background:#008000;color:#FFFFFF;}
-.error{background:#CC0000;color:#FFFFFF;}
+.error_modificado{background:#CC0000;color:#FFFFFF;}
 
 /* Categorias - suscripcion
 -------------------------------------------------- */
@@ -484,6 +484,15 @@ ul.leyenda-cats {
 	text-align: center;
 	background: #F66;
 	color: white;
+}
+.form-agregar {
+	margin: 15px auto;
+	width: 50%;
+	padding: 10px;
+	/*border: 1px solid;*/
+	-webkit-box-shadow: 0px 0px 20px 0 rgba(0, 0, 0, 0.4);
+	-moz-box-shadow: 0px 0px 20px 0 rgba(0, 0, 0, 0.4);
+	box-shadow: 0px 0px 20px 0 rgba(0, 0, 0, 0.4);
 }
 .alert-white {
 	background-color: white;

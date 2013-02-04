@@ -1,4 +1,4 @@
-<?php if (validation_errors()) { ?>
+<?php if (function_exists('validation_errors') && validation_errors()) { ?>
 <div id="1box-errors" class="alert alert-error">
 	<button type="button" class="close" data-dismiss="alert">&times;</button>
 	<span>Por favor corrija los siguientes campos:</span>
@@ -7,7 +7,9 @@
 
 <?php } ?>
 
-
+<?php if ($this->session->flashdata('alert_success')) { ?>
+<div class="alert alert-success"><button type="button" class="close" data-dismiss="alert">&times;</button><strong><?php echo $this->session->flashdata('alert_success'); ?></strong></div>
+<?php } ?>
 <?php if ($this->session->flashdata('success_save')) { ?>
 <div class="alert alert-success"><button type="button" class="close" data-dismiss="alert">&times;</button><strong><?php echo $this->lang->line('this_item_has_been_saved'); ?></strong></div>
 <?php } ?>

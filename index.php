@@ -1,5 +1,4 @@
 <?php
-
 /*
  *---------------------------------------------------------------
  * APPLICATION ENVIRONMENT
@@ -33,7 +32,9 @@ if (defined('ENVIRONMENT'))
 	switch (ENVIRONMENT)
 	{
 		case 'development':
-			require_once('FirePHPCore/fb.PHP');
+			if (gethostname() == "Trinity") {
+				require_once('FirePHPCore/fb.PHP');
+			}
 			error_reporting(E_ALL);
 		break;
 

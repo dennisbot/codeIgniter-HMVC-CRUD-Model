@@ -17,7 +17,7 @@ class Generador extends MX_Controller {
     function index() {
         $this->load->database();
         $this->load->helper('url');
-        if ($this->input->post('table_data') || !$_POST) {
+        if ($this->input->post('table_data', true) || !$_POST) {
             // get table data
             $this->form_validation->set_rules('table', 'Table', 'required|trim|xss_clean|max_length[200]');
             if ($this->form_validation->run() !== false) {
@@ -30,7 +30,7 @@ class Generador extends MX_Controller {
             $this->load->view('generador', $data);
         }
         else {
-            if ($this->input->post('generate')) {
+            if ($this->input->post('generate', true)) {
 
                 $this->load->helper('file');
                 //var_dump($_POST);exit;
@@ -237,8 +237,8 @@ function form_validations_array($rules) {
         $res .= $espacios . '<input type="hidden" name="' . $this->identity . '" value="<?php echo $this->mdl_' . $this->entity_name . '->form_value(\'' . $this->identity . '\'); ?>" />' . "\n";
         $res .= $espacios . "</dl>\n";
         foreach ($fields as $key => $field) {
-            $res .= $espacios . "<dl>\n";
-            $res .= $espacios . "\t<dt><label>* $key </label></dt>\n";
+            $res .= $espacios . "<div class=\"control-group <?php echo form_error('$key') != '' ? 'error' : '';?>\">\n";
+            $res .= $espacios . "\t<label class=\"control-label\">* $key </label>\n";
             $content = "";
             switch ($field) {
                 case 'text' :
@@ -253,8 +253,8 @@ function form_validations_array($rules) {
                     $content = '<textarea cols="26" rows="8" name="' . $key . '" id="' . $key . '"><?php echo $this->mdl_' . $this->entity_name . '->form_value(\'' . $key . '\'); ?></textarea>';
                     break;
             }
-            $res .= $espacios . "<dd>\n$content\n$espacios</dd>\n";
-            $res .= $espacios . "\t</dl>\n";
+            $res .= $espacios . "<div class=\"controls\">\n$content\n$espacios</div>\n";
+            $res .= $espacios . "\t</div>\n";
         }
         return $res;
     }

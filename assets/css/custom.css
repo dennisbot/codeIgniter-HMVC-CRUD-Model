@@ -1,0 +1,35 @@
+/*
+* CUSTOM STYLESHEET
+* -----------------
+*
+* Puede modificar este archivo y agregar estilos personalizados despues de este mensaje.
+* Es mejor escribir estilos personalizados aqui. Asi no se modificaran al hacer actualizaciones al proyecto.
+* 
+*/
+
+/* Responsive que va al FINAL DEL ARCHIVO
+-------------------------------------------------- */
+@media all and (min-width:310px) and (max-width:480px){
+}
+@media (min-width:768px) and (max-width:979px){
+}
+@media (max-width:767px){}
+@media (max-width:767px){
+}
+@media (max-width:480px){}
+@media (min-width:768px) and (max-width:979px){
+}
+@media (min-width:1200px){
+	.bs-docs-sidenav {
+		display:block;
+		width: 260px;
+	}
+}
+@media (max-width:979px){}
+@media (min-width:980px){}
+@media (min-width:980px) and (max-width:1200px){
+	.bs-docs-sidenav {
+		display:block;
+		width: 211px;
+	}
+}

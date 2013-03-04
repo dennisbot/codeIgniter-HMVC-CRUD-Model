@@ -1,0 +1,69 @@
+/*
+* BASE STYLESHEET
+* -----------------
+*
+* NO modificar este archivo. Sirve como estilo base para proyectos nuevos.
+* 
+*/
+
+body {
+	padding: 40px 0;
+	background: #fff;
+	font-family: 'Open Sans Light', sans-serif;
+	color:#666;
+}
+
+/* Estilos opcionales (shortcuts)
+-------------------------------------------------- */
+.full-padded{
+	padding: 20px;
+}
+.left-padded {
+	padding: 0 0 0 20px;
+}
+.right-padded {
+	padding: 0 20px 0 0;
+}
+.background-white {
+	background: white;
+}
+.right {
+	float: right;
+}
+.left {
+	float: left;
+}
+.rounded {
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+.shadow {
+	-moz-box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.2);
+	-webkit-box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.2);
+	box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.2);
+}
+.center-text{
+	text-align: center;
+}
+.capitalize{
+	text-transform: capitalize;
+}
+
+/* Barra de navegacion superior
+-------------------------------------------------- */
+.navbar-inverse .brand, .navbar-inverse .nav > li > a {
+color: #eee;
+}
+
+/* Mensajes de error, info, warning, success
+-------------------------------------------------- */
+#box-errors{margin: 14px 0 10px 10px;background: #F4BFBF;width: 400px;padding: 6px}
+#box-errors span{font-weight: bold;font-size: 12px}
+#box-errors ul{margin-top: 10px}
+#box-errors li.error_modificado li{line-height: 20px;color: #6B0505;font-size: 12px;}
+.info, .warning, .success, .error_modificado {padding:15px 10px 15px 50px;	margin-bottom: 10px;}
+.info{background:#444444;color:#FFFFFF;}
+.warning{background:#FFFFCC;color:#222222;}
+.success{background:#008000;color:#FFFFFF;}
+.error_modificado{background:#CC0000;color:#FFFFFF;}

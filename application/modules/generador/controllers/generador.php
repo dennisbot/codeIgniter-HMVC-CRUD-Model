@@ -38,6 +38,7 @@ class Generador extends MX_Controller {
                 $this->entity_name = $_POST['controller'];
                 /* set the current identity's id */
                 $this->identity = $_POST['primaryKey'];
+                var_dump($this->identity);
                 /* create files */
                 $cur_dir = dirname(__DIR__);
 
@@ -229,32 +230,33 @@ function form_validations_array($rules) {
     }
 
     function fields_form($fields) {
-
-        $espacios = "                ";
+        $space16 = str_repeat(' ', 16);
+        $space12 = str_repeat(' ', 12);
+        $space8 = str_repeat(' ', 8);
         $res = "";
         $res .= "<dl>\n";
 
-        $res .= $espacios . '<input type="hidden" name="' . $this->identity . '" value="<?php echo $this->mdl_' . $this->entity_name . '->form_value(\'' . $this->identity . '\'); ?>" />' . "\n";
-        $res .= $espacios . "</dl>\n";
+        $res .= $space12 . '<input type="hidden" name="' . $this->identity . '" value="<?php echo $this->mdl_' . $this->entity_name . '->form_value(\'' . $this->identity . '\'); ?>" />' . "\n";
+        $res .= $space8 . "</dl>\n";
         foreach ($fields as $key => $field) {
-            $res .= $espacios . "<div class=\"control-group <?php echo form_error('$key') != '' ? 'error' : '';?>\">\n";
-            $res .= $espacios . "\t<label class=\"control-label\">* $key </label>\n";
+            $res .= $space8 . "<div class=\"control-group <?php echo form_error('$key') != '' ? 'error' : '';?>\">\n";
+            $res .= $space12 . "<label class=\"control-label\">* $key </label>\n";
             $content = "";
             switch ($field) {
                 case 'text' :
-                    $content = '<input type="text" name="' . $key . '" value="<?php echo $this->mdl_' . $this->entity_name . '->form_value(\'' . $key . '\'); ?>" />';
+                    $content = $space16.'<input type="text" name="' . $key . '" value="<?php echo $this->mdl_' . $this->entity_name . '->form_value(\'' . $key . '\'); ?>" />';
                     break;
                 case 'dropdown' :
-                    $content = '<select name="' . $key . '">' . "\n" . '
+                    $content = $space16.'<select name="' . $key . '">' . "\n" . '
                                             <option>' . $key . '</option>' . "\n" . '
                                </select>' . "\n";
                     break;
                 case 'textarea' :
-                    $content = '<textarea cols="26" rows="8" name="' . $key . '" id="' . $key . '"><?php echo $this->mdl_' . $this->entity_name . '->form_value(\'' . $key . '\'); ?></textarea>';
+                    $content = $space16.'<textarea cols="26" rows="8" name="' . $key . '" id="' . $key . '"><?php echo $this->mdl_' . $this->entity_name . '->form_value(\'' . $key . '\'); ?></textarea>';
                     break;
             }
-            $res .= $espacios . "<div class=\"controls\">\n$content\n$espacios</div>\n";
-            $res .= $espacios . "\t</div>\n";
+            $res .= $space12 . "<div class=\"controls\">\n$content\n$space12</div>\n";
+            $res .= $space8 . "</div>\n";
         }
         return $res;
     }

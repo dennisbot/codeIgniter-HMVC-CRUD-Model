@@ -14,7 +14,7 @@
 | path to your installation.
 |
 */
-$config['base_url']	= '/agencia/';
+$config['base_url']	= '/cci/';
 $config['public_url'] = $config['base_url']. 'assets/';
 $config['site_name'] = 'my site name';
 $config['language_attributes'] = 'es-ES';

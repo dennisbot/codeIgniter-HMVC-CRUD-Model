@@ -2,7 +2,7 @@
 <?php $this->load->view('dashboard/system_messages'); ?>
 <?php $this->load->view('dashboard/btn_add', array('btn_value'=> 'agregar empleados')); ?>
 </div>
-<table class="table table-striped table-hover" style="margin: 0px auto;">
+<table class="table table-striped table-hover form-agregar" style="margin: 0px auto;">
 	<tr>
 		<?php
                 foreach ($table_headers as $key => $value) { ?>
@@ -21,10 +21,10 @@
 		<?php } ?>
 
 		<td>
-			<a href="<?php echo site_url('empleados/form/idempleado/' . $empleados->idempleado); ?>" title="<?php echo $this->lang->line('edit'); ?>">
+			<a href="<?php echo site_url('empleados/form//' . $empleados->); ?>" title="<?php echo $this->lang->line('edit'); ?>">
 			<?php echo icon('edit'); ?>
 			</a>
-			<a href="<?php echo site_url('empleados/delete/idempleado/' . $empleados->idempleado); ?>" title="<?php echo $this->lang->line('delete'); ?>" onclick="javascript:if(!confirm('<?php echo $this->lang->line('confirm_delete'); ?>')) return false">
+			<a href="<?php echo site_url('empleados/delete//' . $empleados->); ?>" title="<?php echo $this->lang->line('delete'); ?>" onclick="javascript:if(!confirm('<?php echo $this->lang->line('confirm_delete'); ?>')) return false">
 			<?php echo icon('delete'); ?>
 			</a>
 		</td>

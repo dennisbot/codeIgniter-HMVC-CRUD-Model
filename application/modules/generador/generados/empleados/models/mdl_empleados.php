@@ -7,7 +7,7 @@ class Mdl_empleados extends MY_Model {
     public function __construct() {
         parent::__construct();
         $this->table = 'empleados';
-        $this->primary_key = 'empleados.idempleado';
+        $this->primary_key = 'empleados.';
     }
 
      public function default_select() {
@@ -24,6 +24,11 @@ class Mdl_empleados extends MY_Model {
     }
     public function validation_rules() {
         return array(
+            'idempleado' => array(
+                    'field' => 'idempleado',
+                    'label' => 'idempleado',
+                    'rules' => 'required|trim|xss_clean'
+                    ),
             'nombres' => array(
                     'field' => 'nombres',
                     'label' => 'nombres',

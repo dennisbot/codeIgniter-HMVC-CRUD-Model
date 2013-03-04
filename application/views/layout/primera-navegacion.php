@@ -17,9 +17,9 @@
                             <li><?php echo anchor('eventos', '<i class="icon-list"></i> Todos los Eventos') ?></li>
                             <li class="divider"></li>
                             <li class="nav-header">Eventos</li>
-                            <li><?php echo anchor_filter('f_hoydia', '<i class="icon-time"></i> De hoy') ?></li>
-                            <li><?php echo anchor_filter('f_estasemana', '<i class="icon-time"></i> De esta semana') ?></li>
-                            <li><?php echo anchor_filter('f_estemes', '<i class="icon-time"></i> De este mes') ?></li>
+                            <li><?php echo anchor('f_hoydia', '<i class="icon-time"></i> De hoy') ?></li>
+                            <li><?php echo anchor('f_estasemana', '<i class="icon-time"></i> De esta semana') ?></li>
+                            <li><?php echo anchor('f_estemes', '<i class="icon-time"></i> De este mes') ?></li>
                         </ul>
                     </li>
                     <li><?php echo anchor('evento/agregar', '<i class="icon-plus icon-white"></i> Publica tu Evento') ?></li>

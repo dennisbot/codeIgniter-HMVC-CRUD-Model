@@ -60,7 +60,6 @@ class {controller_name} extends MX_Controller {
             /*
              * template
             */
-            $data['header_title'] = 'Administrar Empleados';
 
             $this->template->write('header_title', 'Administrar {controller_name}');
             $this->template->write('title', 'Administrar {controller_name}');

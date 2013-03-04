@@ -19,9 +19,11 @@ class Welcome extends MX_Controller {
 	 */
 	public function index()
 	{
-		$this->load->model('empleados');
+		/*$this->load->model('empleados');
 		$empleados = $this->empleados->get()->result();
-		$this->load->view('empleados_view', array('empleados' => $empleados));
+		$this->load->view('empleados_view', array('empleados' => $empleados));*/
+		$this->template->write_view("content", "welcome_message");
+		$this->template->render();
 	}
 }
 

@@ -64,7 +64,7 @@ $autoload['libraries'] = array('database', 'session', 'template', 'milib');
 |	$autoload['helper'] = array('url', 'file');
 */
 
-$autoload['helper'] = array('url', 'apu');
+$autoload['helper'] = array('url', 'apu', 'uri');
 
 
 /*

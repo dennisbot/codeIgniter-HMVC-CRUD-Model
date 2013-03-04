@@ -3,26 +3,26 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
-class Empleados extends MX_Controller {
+class Guia extends MX_Controller {
 
     public function __construct() {
         parent::__construct();
         $this->load->language('mcb', 'spanish');
         $this->load->helper(array('uri', 'icon'));
         $this->_post_handler();
-        $this->load->model('mdl_empleados');
+        $this->load->model('mdl_guia');
     }
 
     public function index() {
-        $this->load->model('mdl_empleados_table');
-        $this->mdl_empleados->default_limit = $this->config->item('results_per_page');
+        $this->load->model('mdl_guia_table');
+        $this->mdl_guia->default_limit = $this->config->item('results_per_page');
 
-        $this->mdl_empleados->order_by = uri_assoc('order_by');
-        $this->mdl_empleados->order = uri_assoc('order');
+        $this->mdl_guia->order_by = uri_assoc('order_by');
+        $this->mdl_guia->order = uri_assoc('order');
 
         $data = array(
-            'empleadoss' => $this->mdl_empleados->paginate()->result(),
-            'table_headers' => $this->mdl_empleados_table->get_table_headers()
+            'guias' => $this->mdl_guia->paginate()->result(),
+            'table_headers' => $this->mdl_guia_table->get_table_headers()
         );
 
         /*
@@ -42,27 +42,27 @@ class Empleados extends MX_Controller {
         /*
          * template
          */
-        $this->template->write('header_title', 'Listado de Empleados');
-        $this->template->write('title', 'Listado de Empleados');
+        $this->template->write('header_title', 'Listado de Guia');
+        $this->template->write('title', 'Listado de Guia');
         $this->template->write_view('content', 'index', $data);
         $this->template->render();
     }
 
     public function form() {
-        $ = uri_assoc('');
-        if ($this->mdl_empleados->run_validation()) {
-            $ = $this->mdl_empleados->save($);
-            /*redirect('empleados/form//' . $);*/
-            redirect('empleados/index');
+        $idguia = uri_assoc('idguia');
+        if ($this->mdl_guia->run_validation()) {
+            $idguia = $this->mdl_guia->save($idguia);
+            /*redirect('guia/form/idguia/' . $idguia);*/
+            redirect('guia/index');
 
         } else {
-            $this->mdl_empleados->prep_form($);
+            $this->mdl_guia->prep_form($idguia);
             /*
              * template
             */
 
-            $this->template->write('header_title', 'Administrar Empleados');
-            $this->template->write('title', 'Administrar Empleados');
+            $this->template->write('header_title', 'Administrar Guia');
+            $this->template->write('title', 'Administrar Guia');
             $this->template->write_view('content', 'form');
             $this->template->render();
         }
@@ -70,17 +70,17 @@ class Empleados extends MX_Controller {
 
     public function _post_handler() {
         if ($this->input->post('btn_add'))
-            redirect('empleados/form');
+            redirect('guia/form');
         if ($this->input->post('btn_cancel'))
-            redirect('empleados/index');
+            redirect('guia/index');
     }
 
     public function delete() {
-        $ = uri_assoc('');
-        if ($) {
-            $this->mdl_empleados->delete($);
+        $idguia = uri_assoc('idguia');
+        if ($idguia) {
+            $this->mdl_guia->delete($idguia);
         }
-        redirect('empleados/index');
+        redirect('guia/index');
     }
 
 }

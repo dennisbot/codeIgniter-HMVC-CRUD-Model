@@ -47,7 +47,7 @@ FB::log($alias, "alias:\n");
                 $sel = 'dropdown';
             }elseif(strpos($a->Type,'blob') !== false || strpos($a->Type,'text') !== false){
                 $sel = 'textarea';
-            }else if($a->Key == 'PRI' || $a->Key == 'MUL'){
+            }else if($a->Key == 'PRI'){
                 $sel = 'exclude';
                 echo form_hidden('primaryKey',$a->Field);
             }else if(strpos($a->Field,'password') !== false){

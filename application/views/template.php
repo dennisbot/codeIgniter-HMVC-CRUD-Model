@@ -14,7 +14,7 @@
 	<?php if ($title != '') : ?>
     <h1><?php echo $title ?></h1>
 	<?php endif; ?>
-    <div class="span12 background-white shadow">
+    <div class="span12 background-white shadow" style="min-height: 400px">
     <?php echo $content ?>
     </div>
 <?php $this->load->view('layout/footer'); ?>

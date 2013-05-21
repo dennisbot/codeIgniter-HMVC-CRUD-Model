@@ -60,7 +60,8 @@ class {controller_name} extends MX_Controller {
             /*
              * template
             */
-
+            $this->template->add_js(public_url() . "jquery/validate/jquery.validate.min.js");
+            $this->template->add_js(public_url() . "{entity}/validate_{entity}.js");
             $this->template->write('header_title', 'Administrar {controller_name}');
             $this->template->write('title', 'Administrar {controller_name}');
             $this->template->write_view('content', 'form');

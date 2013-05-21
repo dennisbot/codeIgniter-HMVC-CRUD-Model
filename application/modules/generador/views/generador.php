@@ -7,7 +7,6 @@ echo form_dropdown('table', $table);
 </form>
 <?php
 if(isset($alias)) {
-FB::log($alias, "alias:\n");
 ?>
 <form action="<?php echo current_url();?>" method="post">
 <input type="hidden" name="table" value="<?php echo $table ?>" />
@@ -47,12 +46,12 @@ FB::log($alias, "alias:\n");
                 $sel = 'dropdown';
             }elseif(strpos($a->Type,'blob') !== false || strpos($a->Type,'text') !== false){
                 $sel = 'textarea';
-            }else if($a->Key == 'PRI'){
+            }else if($a->Key == 'PRI' || $a->Key == 'MUL'){
                 $sel = 'exclude';
-                echo form_hidden('primaryKey',$a->Field);
-            }else if(strpos($a->Field,'password') !== false){
+                echo form_hidden('primaryKey', $a->Field);
+            }else if(strpos($a->Field,'password') !== false) {
                 $sel = 'password';
-            }else if(strpos($a->Field,'email') !== false){
+            }else if(strpos($a->Field,'email') !== false) {
                 $email_default = TRUE;
             }else{
                  $sel = 'text';
@@ -63,7 +62,7 @@ FB::log($alias, "alias:\n");
             echo '<br> Type::'.form_dropdown('type['.$a->Field.']', $type,$sel);
 
             echo '<br>';
-            echo form_checkbox('rules['.$a->Field.'][]', 'required', TRUE) . ' required :: ';
+            echo form_checkbox('rules['.$a->Field.'][]', 'required', $a->Null == 'NO') . ' required :: ';
             echo form_checkbox('rules['.$a->Field.'][]', 'trim', TRUE) . ' trim :: ';
             echo form_checkbox('rules['.$a->Field.'][]', 'valid_email', $email_default) . ' email :: ';
             echo form_checkbox('rules['.$a->Field.'][]', 'xss_clean', TRUE) . ' xss_clean ::';

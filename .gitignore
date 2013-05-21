@@ -1,3 +1,5 @@
 #para ignorar los archivos generados por sublimeText 2
 *.sublime-project
 *.sublime-workspace
+*.sql
+otros

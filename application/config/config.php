@@ -14,11 +14,12 @@
 | path to your installation.
 |
 */
-$config['base_url']	= '/plantilla/';
+
+$config['base_url']	= '/';
 $config['public_url'] = $config['base_url']. 'assets/';
 $config['site_name'] = 'my site name';
 $config['language_attributes'] = 'es-ES';
-$config['site_email'] = 'dennisbot@gmail.com';
+
 /* bootstrap Assets files */
 $config['bootstrap_js'] = $config['public_url'] . 'bootstrap/js/';
 $config['bootstrap_css'] = $config['public_url'] . 'bootstrap/css/';

@@ -23,14 +23,14 @@ if (!defined('BASEPATH'))
  * This class is and interface to CI's View class. It aims to improve the
  * interaction between controllers and views. Follow @link for more info
  *
- * @package		CodeIgniter
- * @author		Colin Williams
- * @subpackage	Libraries
- * @category	Libraries
- * @link		http://www.williamsconcepts.com/ci/libraries/template/index.html
+ * @package     CodeIgniter
+ * @author      Colin Williams
+ * @subpackage  Libraries
+ * @category    Libraries
+ * @link        http://www.williamsconcepts.com/ci/libraries/template/index.html
  * @copyright  Copyright (c) 2008, Colin Williams.
  * @version 1.4.1
- * 
+ *
  */
 class CI_Template {
 
@@ -53,10 +53,10 @@ class CI_Template {
     /**
      * Constructor
      *
-     * Loads template configuration, template regions, and validates existence of 
+     * Loads template configuration, template regions, and validates existence of
      * default template
      *
-     * @access	public
+     * @access  public
      */
     function CI_Template() {
         // Copy an instance of CI so we can use the entire framework.
@@ -183,7 +183,7 @@ class CI_Template {
                 '_styles' => array(),
             );
             foreach ($regions as $key => $region) {
-                // Regions must be arrays, but we take the burden off the template 
+                // Regions must be arrays, but we take the burden off the template
                 // developer and insure it here
                 if (!is_array($region)) {
                     $this->add_region($region);
@@ -269,11 +269,11 @@ class CI_Template {
     /**
      * Write contents to a region
      *
-     * @access	public
-     * @param	string	region to write to
-     * @param	string	what to write
-     * @param	boolean	FALSE to append to region, TRUE to overwrite region
-     * @return	void
+     * @access  public
+     * @param   string  region to write to
+     * @param   string  what to write
+     * @param   boolean FALSE to append to region, TRUE to overwrite region
+     * @return  void
      */
     function write($region, $content, $overwrite = FALSE) {
         if (isset($this->regions[$region])) {
@@ -295,12 +295,12 @@ class CI_Template {
     /**
      * Write content from a View to a region. 'Views within views'
      *
-     * @access	public
-     * @param	string	region to write to
-     * @param	string	view file to use
-     * @param	array	variables to pass into view
-     * @param	boolean	FALSE to append to region, TRUE to overwrite region
-     * @return	void
+     * @access  public
+     * @param   string  region to write to
+     * @param   string  view file to use
+     * @param   array   variables to pass into view
+     * @param   boolean FALSE to append to region, TRUE to overwrite region
+     * @return  void
      */
     function write_view($region, $view, $data = NULL, $overwrite = FALSE) {
         $args = func_get_args();
@@ -362,7 +362,7 @@ class CI_Template {
 
     /**
      * Dynamically include javascript in the template
-     * 
+     *
      * NOTE: This function does NOT check for existence of .js file
      *
      * @access  public
@@ -371,18 +371,12 @@ class CI_Template {
      * @param   boolean  TRUE to use 'defer' attribute, FALSE to exclude it
      * @return  TRUE on success, FALSE otherwise
      */
-    function add_js($script, $type = 'import', $defer = FALSE, $place = 'footer', $fullpath = false) {
+    function add_js($script, $type = 'import', $defer = FALSE, $place = 'footer') {
         $success = TRUE;
         $js = NULL;
-
-        $this->CI->load->helper('url');
-        if (strpos($script, 'http') === 0 || $fullpath)
-            $filepath = $script;
-        else
-            $filepath = base_js() . $script;
         switch ($type) {
             case 'import':
-                $js = '<script type="text/javascript" src="' . $filepath . '"';
+                $js = '<script type="text/javascript" src="' . $script . '"';
                 if ($defer) {
                     $js .= ' defer="defer"';
                 }
@@ -427,7 +421,7 @@ class CI_Template {
 
     /**
      * Dynamically include CSS in the template
-     * 
+     *
      * NOTE: This function does NOT check for existence of .css file
      *
      * @access  public
@@ -436,20 +430,14 @@ class CI_Template {
      * @param   string  media attribute to use with 'link' type only, FALSE for none
      * @return  TRUE on success, FALSE otherwise
      */
-    function add_css($style, $type = 'link', $media = FALSE, $fullpath = false) {
+    function add_css($style, $type = 'link', $media = FALSE) {
         $success = TRUE;
         $css = NULL;
-
-        $this->CI->load->helper('url');
-        if (strpos($style, 'http') === 0 || $fullpath)
-            $filepath = $style;
-        else
-            $filepath = base_css() . $style;
 
         switch ($type) {
             case 'link':
 
-                $css = '<link type="text/css" rel="stylesheet" href="' . $filepath . '"';
+                $css = '<link type="text/css" rel="stylesheet" href="' . $style . '"';
                 if ($media) {
                     $css .= ' media="' . $media . '"';
                 }
@@ -457,7 +445,7 @@ class CI_Template {
                 break;
 
             case 'import':
-                $css = '<style type="text/css">@import url(' . $filepath . ');</style>';
+                $css = '<style type="text/css">@import url(' . $style . ');</style>';
                 break;
 
             case 'embed':
@@ -492,10 +480,10 @@ class CI_Template {
     /**
      * Render the master template or a single region
      *
-     * @access	public
-     * @param	string	optionally opt to render a specific region
-     * @param	boolean	FALSE to output the rendered template, TRUE to return as a string. Always TRUE when $region is supplied
-     * @return	void or string (result of template build)
+     * @access  public
+     * @param   string  optionally opt to render a specific region
+     * @param   boolean FALSE to output the rendered template, TRUE to return as a string. Always TRUE when $region is supplied
+     * @return  void or string (result of template build)
      */
     function render($region = NULL, $buffer = FALSE, $parse = FALSE) {
         // Just render $region if supplied
@@ -536,7 +524,7 @@ class CI_Template {
      * Load the master template or a single region
      *
      * DEPRECATED!
-     * 
+     *
      * Use render() to compile and display your template and regions
      */
     function load($region = NULL, $buffer = FALSE) {
@@ -549,11 +537,11 @@ class CI_Template {
     /**
      * Build a region from it's contents. Apply wrapper if provided
      *
-     * @access	private
-     * @param	string	region to build
-     * @param	string	HTML element to wrap regions in; like '<div>'
-     * @param	array	Multidimensional array of HTML elements to apply to $wrapper
-     * @return	string	Output of region contents
+     * @access  private
+     * @param   string  region to build
+     * @param   string  HTML element to wrap regions in; like '<div>'
+     * @param   array   Multidimensional array of HTML elements to apply to $wrapper
+     * @return  string  Output of region contents
      */
     function _build_content($region, $wrapper = NULL, $attributes = NULL) {
         $output = NULL;

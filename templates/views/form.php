@@ -1,6 +1,6 @@
 <div class="padded form-agregar">
     <?php $this->load->view('dashboard/system_messages'); ?>
-    <form class="form-horizontal" method="post" action="<?php echo site_url($this->uri->uri_string()); ?>">
+    <form class="form-horizontal" method="post" id="form-{entity}" action="<?php echo site_url($this->uri->uri_string()); ?>">
         {fields_form}
         <div class="control-group">
             <div class="controls">

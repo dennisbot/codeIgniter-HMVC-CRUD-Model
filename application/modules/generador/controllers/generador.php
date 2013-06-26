@@ -15,6 +15,11 @@ class Generador extends MX_Controller {
         $this->load->library('form_validation');
     }
     function index() {
+
+        /*var_dump($this->indent(json_encode(array('frutas' => array('platano', 'mandarina', 'queso')))));
+        var_dump(json_encode(array('frutas' => array('platano', 'mandarina', 'queso'))));
+        exit;*/
+
         $this->load->database();
         $this->load->helper('url');
         if ($this->input->post('table_data', true) || !$_POST) {
@@ -33,7 +38,6 @@ class Generador extends MX_Controller {
             if ($this->input->post('generate', true)) {
 
                 $this->load->helper('file');
-                //var_dump($_POST);exit;
                 /* set the current entity name */
                 $this->entity_name = $_POST['controller'];
                 /* set the current identity's id */
@@ -41,8 +45,9 @@ class Generador extends MX_Controller {
                 var_dump($this->identity);
                 /* create files */
                 $cur_dir = dirname(__DIR__);
-
+                var_dump("cur_dir", $cur_dir);
                 $cur_dir .= '/generados/';
+
                 if (!(is_dir($cur_dir)))
                     mkdir ($cur_dir);
 
@@ -50,16 +55,39 @@ class Generador extends MX_Controller {
 
                 if (is_dir($path_entity))
                     $this->delete_directory($path_entity);
+                /* creamos el directorio entidad que alojará a la triada */
+                if(mkdir($path_entity)) {
+                    echo "entidad " . $this->entity_name . " creada<br />";
+                }
 
-                echo mkdir($path_entity);
 
                 $this->mvc = array(
                     'models' => $path_entity . '/models/',
                     'views' => $path_entity . '/views/',
                     'controllers' => $path_entity . '/controllers/',
+                    'assets' => array(
+                        'js' => 'assets/' . $this->entity_name . '/'
+                    )
                 );
-                foreach ($this->mvc as $value) {
-                    echo mkdir($value);
+                foreach ($this->mvc as $key => $value) {
+                    if ($key == 'assets') {
+                        foreach ($this->mvc[$key] as $k => $v) {
+                            if (is_dir($this->mvc[$key][$k])) {
+                                $this->delete_directory($this->mvc[$key][$k]);
+                            }
+                            var_dump($this->mvc[$key][$k]);
+                            if ($res = mkdir($this->mvc[$key][$k])) {
+                                echo "directorio assets -> " . $k . " creado<br />";
+                            } else {
+                                var_dump($res);
+                            }
+                        }
+                    }
+                    else {
+                        if (mkdir($value)) {
+                            echo "carpeta " . $key . " creada<br />";
+                        }
+                    }
                 }
 
                 /* create model */
@@ -70,7 +98,8 @@ class Generador extends MX_Controller {
                 $this->create_controller();
                 /* create views */
                 $this->create_view();
-                exit;
+                /* create assets js */
+                $this->create_assets_js();
             }
         }
 
@@ -88,7 +117,8 @@ class Generador extends MX_Controller {
         }
         return $res;
     }
-function form_validations_array($rules) {
+
+    function form_validations_array($rules) {
         $res = "return array(\n";
         foreach ($rules as $key => $value) {
             $r = "";
@@ -102,7 +132,7 @@ function form_validations_array($rules) {
                     'rules' => '$r'
                     ),\n";
         }
-        return substr($res, 0, -2) . "\n".str_repeat(' ', 8).");";
+        return substr($res, 0, -2) . "\n" . str_repeat(' ', 8).");";
     }
 
     function create_model() {
@@ -218,7 +248,7 @@ function form_validations_array($rules) {
     }
 
     function view_headers() {
-        $espacios = "                ";
+        $espacios = str_repeat(' ', 16);
         $content = "<?php\n";
         $content .= $espacios . "foreach ($" . "table_headers as $" . "key => $" . "value) { ?>\n";
         $content .= $espacios . "<th><?php echo $" . "table_headers[$" . "key]; ?></th>\n";
@@ -243,6 +273,7 @@ function form_validations_array($rules) {
             $res .= $space12 . "<label class=\"control-label\">* $key </label>\n";
             $content = "";
             switch ($field) {
+                case 'password' :
                 case 'text' :
                     $content = $space16.'<input type="text" name="' . $key . '" value="<?php echo $this->mdl_' . $this->entity_name . '->form_value(\'' . $key . '\'); ?>" />';
                     break;
@@ -259,6 +290,39 @@ function form_validations_array($rules) {
             $res .= $space8 . "</div>\n";
         }
         return $res;
+    }
+
+    public function create_assets_js()
+    {
+        $rules = $_POST['rules'];
+        $space4 = str_repeat(' ', 4);
+        $space8 = str_repeat(' ', 8);
+        $space12 = str_repeat(' ', 12);
+        $space16 = str_repeat(' ', 16);
+        $content_asset_js = "$(document).ready(function() {\n";
+        $content_asset_js .= $space4 . "$.validator.messages.required = 'Este campo es requerido';\n";
+        $content_asset_js .= $space4 . "$.validator.messages.email = 'Ingrese una dirección de email válida';\n";
+        $content_asset_js .= $space4 . "$('#form-" . $this->entity_name . "').validate(\n";
+        $res = array('rules' => array());
+        $map_rules = array('required' => 'required', 'valid_email' => 'email');
+        var_dump($this->indent_json(json_encode($rules)));
+        if (isset($rules) && !empty($rules)) {
+            foreach ($rules as $name => $the_rules) {
+                    $res['rules'][$name] = array();
+                    foreach ($the_rules as $the_rule) {
+                        if ($the_rule != 'required' && $the_rule != 'valid_email') continue;
+                        $res['rules'][$name][$map_rules[$the_rule]] = true;
+                    }
+            }
+            $content_asset_js .= $this->indent_json(json_encode($res)) . "\n";
+            $content_asset_js .= $space8 . ");//end of validate\n";
+            $content_asset_js .= $space4 . "}//end of function\n";
+            $content_asset_js .= ");//end of ready\n";
+        }
+        else {
+            echo "esta vacio los rules";
+        }
+        write_file($this->mvc['assets']['js'] . 'validate_' . $this->entity_name . '.js', $content_asset_js);
     }
 
     function fexist($path) {
@@ -298,7 +362,53 @@ function form_validations_array($rules) {
         return true;
 
     }
+    function indent_json($json) {
 
+        $pos         = 0;
+        $strLen      = strlen($json);
+        $indentStr   = str_repeat(' ', 2);
+        $newLine     = "\n";
+        $prevChar    = '';
+        $outOfQuotes = true;
+        $tab         = str_repeat(' ', 12);
+        $result      = $tab;
+
+        for ($i=0; $i<=$strLen; $i++) {
+
+            // Grab the next character in the string.
+            $char = substr($json, $i, 1);
+
+            // Are we inside a quoted string?
+            if ($char == '"' && $prevChar != '\\') {
+                $outOfQuotes = !$outOfQuotes;
+
+            // If this character is the end of an element,
+            // output a new line and indent the next line.
+            } else if(($char == '}' || $char == ']') && $outOfQuotes) {
+                $result .= $newLine . $tab;
+                $pos --;
+                $result .= str_repeat($indentStr, $pos);
+            }
+
+            // Add the character to the result string.
+            $result .= $char;
+
+            // If the last character was the beginning of an element,
+            // output a new line and indent the next line.
+            if (($char == ',' || $char == '{' || $char == '[') && $outOfQuotes) {
+                $result .= $newLine . $tab;
+                if ($char == '{' || $char == '[') {
+                    $pos ++;
+                }
+
+                $result .= str_repeat($indentStr, $pos);
+            }
+
+            $prevChar = $char;
+        }
+
+        return $result;
+    }
 }
 
 ?>

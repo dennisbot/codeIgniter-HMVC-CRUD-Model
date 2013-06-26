@@ -38,7 +38,7 @@ class MY_Model extends CI_Model {
 	public $page_links;
 	public $query;
 	public $form_values	 = array();
-	protected $default_validation_rules	 = 'validation_rules';
+	protected $default_validation_rules = 'validation_rules';
 	protected $validation_rules;
 	public $validation_errors;
 	public $total_rows;
@@ -56,7 +56,7 @@ class MY_Model extends CI_Model {
 	public function __call($name, $arguments)
 	{
         call_user_func_array(array($this->db, $name), $arguments);
-        $this->user_funcs[] = array($name, $arguments);
+        $this->user_funcs[] = array("method" => $name, "args" => $arguments);
         return $this;
 	}
 
@@ -65,7 +65,7 @@ class MY_Model extends CI_Model {
 	 * based on methods in child model.
 	 * $this->model_name->get()
 	 */
-	public function get($include_defaults = true)
+	public function get($include_defaults = false)
 	{
 		if ($include_defaults)
 		{
@@ -107,7 +107,7 @@ class MY_Model extends CI_Model {
 	 * Call when paginating results.
 	 * $this->model_name->paginate()
 	 */
-	public function paginate()
+	public function paginate($exclude_methods = array())
 	{
 		$uri_segment = '';
 		$offset		 = 0;
@@ -115,10 +115,11 @@ class MY_Model extends CI_Model {
 
 		$this->load->helper('url');
 		$this->load->library('pagination');
-
-		$this->set_defaults();
+		$this->db->select("count({$this->primary_key}) as total_rows");
 
 		$uri_segments = $this->uri->segment_array();
+
+
 		foreach ($uri_segments as $key => $segment)
 		{
 			if ($segment == 'page')
@@ -135,9 +136,7 @@ class MY_Model extends CI_Model {
 				$base_url = site_url(implode('/', $uri_segments) . '/page/');
 			}
 		}
-
-		$this->total_rows = $this->get($this->table)->num_rows();
-
+		$this->total_rows = $this->db->get($this->table)->row()->total_rows;
 		if (!$uri_segment)
 		{
 			$base_url = site_url($this->uri->uri_string() . '/page/');
@@ -162,18 +161,73 @@ class MY_Model extends CI_Model {
 		/**
 		 * Done with pagination, now on to the paged results
 		 */
-		$this->set_defaults();
+		$this->set_defaults($exclude_methods);
 
         foreach ($this->user_funcs as $func)
         {
-            call_user_func_array(array($this->db, $func[0]), $func[1]);
+            call_user_func_array(array($this->db, $func["method"]), $func["args"]);
         }
-
 
 		$this->db->limit($per_page, $offset);
 		$this->query = $this->db->get($this->table);
 
 		$this->user_funcs = array();
+
+		return $this;
+	}
+
+	/**
+	 * Call when paginating results of any query
+	 * no predefined table or default methods
+	 * $this->model_name->paginate()
+	 */
+	public function paginate_bot($exclude_methods = array(), $rows_x_page)
+	{
+		/**
+		 * Done with pagination, now on to the paged results
+		 */
+		$offset = uri_page();
+		$per_page = $rows_x_page;
+		$this->set_defaults($exclude_methods);
+		$this->db->limit($per_page, $offset);
+		$this->query = $this->db->get($this->table);
+		/* seteamos la creacion de links */
+		$uri_segment = '';
+
+		$this->load->helper('url');
+		$this->load->library('pagination');
+
+		$this->total_rows = $this->db->query("select FOUND_ROWS() as total_rows")->row()->total_rows;
+		$uri_segments = $this->uri->segment_array();
+
+		foreach ($uri_segments as $key => $segment)
+		{
+			if ($segment == 'page')
+			{
+				$uri_segment = $key + 1;
+				unset($uri_segments[$key], $uri_segments[$key + 1]);
+				$base_url = site_url(implode('/', $uri_segments) . '/page/');
+			}
+		}
+		if (!$uri_segment)
+		{
+			$base_url = site_url($this->uri->uri_string() . '/page/');
+		}
+
+		$config = array(
+			'base_url'		 => $base_url,
+			'uri_segment'	 => $uri_segment,
+			'total_rows'	 => $this->total_rows,
+			'per_page'		 => $per_page
+		);
+
+		if ($this->config->item('pagination_style'))
+		{
+			$config = array_merge($config, $this->config->item('pagination_style'));
+		}
+		$this->pagination->initialize($config);
+
+		$this->page_links = $this->pagination->create_links();
 
 		return $this;
 	}
@@ -186,7 +240,7 @@ class MY_Model extends CI_Model {
 		return $this->where($this->primary_key, $id)->get()->row();
 	}
 
-	public function save($id = NULL, $db_array = NULL)
+	public function save($id = NULL, $db_array = NULL, $set_flash_data = true)
 	{
 		if (!$db_array)
 		{
@@ -200,11 +254,17 @@ class MY_Model extends CI_Model {
 				$db_array[$this->date_created_field] = time();
 			}
 
+
 			$this->db->insert($this->table, $db_array);
-
-			$this->session->set_flashdata('alert_success', 'Record successfully created.');
-
-			return $this->db->insert_id();
+			if ($set_flash_data)
+				$this->session->set_flashdata('alert_success', 'Agregado correctamente.');
+			if($this->db->insert_id() == ''){
+				if($this->db->_error_number() == 1062)
+					return 'duplicado';
+				//return $this->db->_error_number();
+			}
+			else
+				return $this->db->insert_id();
 		}
 		else
 		{
@@ -215,8 +275,8 @@ class MY_Model extends CI_Model {
 
 			$this->db->where($this->primary_key, $id);
 			$this->db->update($this->table, $db_array);
-
-			$this->session->set_flashdata('alert_success', 'Record successfully updated.');
+			if ($set_flash_data)
+				$this->session->set_flashdata('alert_success', 'Actualizado correctamente.');
 
 			return $id;
 		}
@@ -251,8 +311,7 @@ class MY_Model extends CI_Model {
 	{
 		$this->db->where($this->primary_key, $id);
 		$this->db->delete($this->table);
-
-		$this->session->set_flashdata('alert_success', 'Record successfully deleted.');
+		//$this->session->set_flashdata('alert_success', 'Record successfully deleted.');
 	}
 
 	/**

@@ -10,7 +10,7 @@ class {model_name} extends MY_Model {
         $this->primary_key = '{entity}.{identity}';
     }
 
-     public function default_select() {
+    public function default_select() {
         $this->db->select('{entity}.*');
     }
 

@@ -23,11 +23,13 @@ $config['language_attributes'] = 'es-ES';
 $config['bootstrap_js'] = $config['public_url'] . 'bootstrap/js/';
 $config['bootstrap_css'] = $config['public_url'] . 'bootstrap/css/';
 $config['bootstrap_img'] = $config['public_url'] . 'bootstrap/img/';
+
 /* jquery Assets files */
 $config['base_js'] = $config['public_url'] . 'js/';
 $config['base_css'] = $config['public_url'] . 'css/';
 $config['base_img'] = $config['public_url'] . 'img/';
 $config['base_jquery'] = $config['public_url'] . 'jquery/';
+
 /* Fonts Awesome Assets files */
 $config['font_awesome_css'] = $config['public_url'] . 'font_awesome/css/';
 /*

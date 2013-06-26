@@ -1,20 +1,31 @@
 <?php
 /**
  *
- * Template: Pagina de Inicio
+ * Template: full width
  *
  */
 ?>
 
 <?php $this->load->view('layout/header'); ?>
 
-<?php $this->load->view('layout/primera-navegacion'); ?>
+<?php $this->load->view('layout/navegacion'); ?>
 
-<div class="container">
+<div class="container-fluid">
+	
 	<?php if ($title != '') : ?>
-    <h1><?php echo $title ?></h1>
+    	
+    	<h1><?php echo $title ?></h1>
+
 	<?php endif; ?>
-    <div class="span12 background-white shadow">
-    <?php echo $content ?>
+    
+    <div class="row-fluid">
+
+		<div class="span12">
+
+			<?php echo $content ?>
+
+		</div>
+
     </div>
+
 <?php $this->load->view('layout/footer'); ?>

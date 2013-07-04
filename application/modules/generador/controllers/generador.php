@@ -3,19 +3,23 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
-class Generador extends MX_Controller {
-
+class Generador extends MX_Controller
+{
     public $entity_name;
     public $identity;
     public $mvc = array();
     private $list_tables;
-    function __construct() {
+
+    function __construct()
+    {
         parent::__construct();
         $this->list_tables = $this->db->list_tables();
         $this->load->library('form_validation');
+        $this->template->add_css(base_css() . "generator.css");
     }
-    function index() {
 
+    function index()
+    {
         /*var_dump($this->indent(json_encode(array('frutas' => array('platano', 'mandarina', 'queso')))));
         var_dump(json_encode(array('frutas' => array('platano', 'mandarina', 'queso'))));
         exit;*/
@@ -31,8 +35,9 @@ class Generador extends MX_Controller {
                 $data['table_name'] = $this->list_tables[$this->input->post('table')];
             }
             $data['table'] = $this->list_tables;
-
-            $this->load->view('generador', $data);
+            $this->template->write_view('content', 'generador', $data);
+            $this->template->render();
+            // $this->load->view('generador', $data);
         }
         else {
             if ($this->input->post('generate', true)) {
@@ -118,7 +123,8 @@ class Generador extends MX_Controller {
         return $res;
     }
 
-    function form_validations_array($rules) {
+    function form_validations_array($rules)
+    {
         $res = "return array(\n";
         foreach ($rules as $key => $value) {
             $r = "";
@@ -135,7 +141,8 @@ class Generador extends MX_Controller {
         return substr($res, 0, -2) . "\n" . str_repeat(' ', 8).");";
     }
 
-    function create_model() {
+    function create_model()
+    {
         $content = file_get_contents('templates/models/mdl_entity.php');
 
         $model_search = array('{model_name}', '{entity}', '{identity}', '{form_validations}');
@@ -152,7 +159,8 @@ class Generador extends MX_Controller {
         write_file($this->mvc['models'] . 'mdl_' . $this->entity_name . '.php', $model_content);
     }
 
-    function create_model_headers() {
+    function create_model_headers()
+    {
         $content = file_get_contents('templates/models/mdl_entity_table.php');
 
         $model_search = array('{model_name_table}', '{headers}');
@@ -167,7 +175,8 @@ class Generador extends MX_Controller {
         write_file($this->mvc['models'] . 'mdl_' . $this->entity_name . '_table.php', $model_content);
     }
 
-    function headers($fields) {
+    function headers($fields)
+    {
         $res = "$" . "headers = array(\n";
         $res .= "        '" . $this->identity . "' => anchor('" . $this->entity_name . '/index/order_by/' . $this->identity . "/order/'.$" . "order, '" . $this->identity . "'),\n";
         foreach ($fields as $field) {
@@ -178,7 +187,8 @@ class Generador extends MX_Controller {
         return $res;
     }
 
-    function create_controller() {
+    function create_controller()
+    {
         $content = file_get_contents('templates/controllers/entity.php');
 
         $controller_search = array('{controller_name}', '{entity}', '{identity}', '{model_name}', '{model_name_table}', '{switch_order}');
@@ -197,8 +207,8 @@ class Generador extends MX_Controller {
         write_file($this->mvc['controllers'] . $this->entity_name . '.php', $controller_content);
     }
 
-    function switch_order($fields) {
-
+    function switch_order($fields)
+    {
         $content = "switch (" . "$" . "order_by) {\n";
 
         foreach ($fields as $field) {
@@ -216,7 +226,8 @@ class Generador extends MX_Controller {
         return $content;
     }
 
-    function create_view() {
+    function create_view()
+    {
         /* para el form */
         $content = file_get_contents('templates/views/form.php');
 
@@ -247,7 +258,8 @@ class Generador extends MX_Controller {
         write_file($this->mvc['views'] . 'index.php', $view_content);
     }
 
-    function view_headers() {
+    function view_headers()
+    {
         $espacios = str_repeat(' ', 16);
         $content = "<?php\n";
         $content .= $espacios . "foreach ($" . "table_headers as $" . "key => $" . "value) { ?>\n";
@@ -259,7 +271,8 @@ class Generador extends MX_Controller {
         return $content;
     }
 
-    function fields_form($fields) {
+    function fields_form($fields)
+    {
         $space16 = str_repeat(' ', 16);
         $space12 = str_repeat(' ', 12);
         $space8 = str_repeat(' ', 8);
@@ -325,7 +338,8 @@ class Generador extends MX_Controller {
         write_file($this->mvc['assets']['js'] . 'validate_' . $this->entity_name . '.js', $content_asset_js);
     }
 
-    function fexist($path) {
+    function fexist($path)
+    {
         if (file_exists($path)) {
             // todo , automatically adds new validation
             return $path . ' - File exists <br>';
@@ -334,7 +348,8 @@ class Generador extends MX_Controller {
         }
     }
 
-    function writefile($file, $content) {
+    function writefile($file, $content)
+    {
 
         if (!write_file($file, $content)) {
             return $file . ' - Unable to write the file';
@@ -343,7 +358,8 @@ class Generador extends MX_Controller {
         }
     }
 
-    function delete_directory($dirname) {
+    function delete_directory($dirname)
+    {
 
         if (is_dir($dirname))
             $dir_handle = opendir($dirname);
@@ -362,7 +378,8 @@ class Generador extends MX_Controller {
         return true;
 
     }
-    function indent_json($json) {
+    function indent_json($json)
+    {
 
         $pos         = 0;
         $strLen      = strlen($json);

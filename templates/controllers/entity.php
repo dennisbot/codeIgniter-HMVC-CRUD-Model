@@ -3,9 +3,11 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
-class {controller_name} extends MX_Controller {
+class {controller_name} extends MX_Controller
+{
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->load->language('mcb', 'spanish');
         $this->load->helper(array('uri', 'icon'));
@@ -13,7 +15,8 @@ class {controller_name} extends MX_Controller {
         $this->load->model('{model_name}');
     }
 
-    public function index() {
+    public function index()
+    {
         $this->load->model('{model_name_table}');
         $this->{model_name}->default_limit = $this->config->item('results_per_page');
 
@@ -48,7 +51,8 @@ class {controller_name} extends MX_Controller {
         $this->template->render();
     }
 
-    public function form() {
+    public function form()
+    {
         ${identity} = uri_assoc('{identity}');
         if ($this->{model_name}->run_validation()) {
             ${identity} = $this->{model_name}->save(${identity});
@@ -69,14 +73,16 @@ class {controller_name} extends MX_Controller {
         }
     }
 
-    public function _post_handler() {
+    public function _post_handler()
+    {
         if ($this->input->post('btn_add'))
             redirect('{entity}/form');
         if ($this->input->post('btn_cancel'))
             redirect('{entity}/index');
     }
 
-    public function delete() {
+    public function delete()
+    {
         ${identity} = uri_assoc('{identity}');
         if (${identity}) {
             $this->{model_name}->delete(${identity});

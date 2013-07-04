@@ -11,15 +11,22 @@
             <div class="nav-collapse collapse">
 
                 <ul class="nav">
-                   <li class="dropdown">
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-book icon-white"></i> Entidad<b class="caret"></b></a>
-							<ul class="dropdown-menu">
-								<li><a href="#"><i class="icon-th-list"></i> Listar Datos</a></li>
-								<li class="divider"></li>
-								<li class="nav-header">Gestion</li>
-								<li><a href="#"><i class="icon-plus"></i> Nuevo Dato</a></li>
-							</ul>
-						</li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-book icon-white"></i> Entidad<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#"><i class="icon-th-list"></i> Listar Datos</a></li>
+                            <li class="divider"></li>
+                            <li class="nav-header">Gestion</li>
+                            <li><a href="#"><i class="icon-plus"></i> Nuevo Dato</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <?php
+                            echo anchor('generador',
+                                '<i class="icon-screenshot icon-white"></i> Scaffolding Generator'
+                            );
+                        ?>
+                    </li>
                 </ul>
 
 				<ul class="nav pull-right">

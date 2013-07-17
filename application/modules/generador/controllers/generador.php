@@ -273,17 +273,22 @@ class Generador extends MX_Controller
 
     function fields_form($fields)
     {
+        $rules = $_POST['rules'];
         $space16 = str_repeat(' ', 16);
         $space12 = str_repeat(' ', 12);
         $space8 = str_repeat(' ', 8);
         $res = "";
-        $res .= "<dl>\n";
-
-        $res .= $space12 . '<input type="hidden" name="' . $this->identity . '" value="<?php echo $this->mdl_' . $this->entity_name . '->form_value(\'' . $this->identity . '\'); ?>" />' . "\n";
-        $res .= $space8 . "</dl>\n";
         foreach ($fields as $key => $field) {
+            $ok = false;
+            foreach ($rules[$key] as $value) {
+                if ($value == 'required') {
+                    $ok = true;
+                    break;
+                }
+            }
+            $req = $ok ? '*' : '';
             $res .= $space8 . "<div class=\"control-group <?php echo form_error('$key') != '' ? 'error' : '';?>\">\n";
-            $res .= $space12 . "<label class=\"control-label\">* $key </label>\n";
+            $res .= $space12 . "<label class=\"control-label\">$req $key </label>\n";
             $content = "";
             switch ($field) {
                 case 'password' :

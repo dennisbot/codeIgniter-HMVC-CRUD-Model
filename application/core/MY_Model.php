@@ -34,7 +34,7 @@ class MY_Model extends CI_Model {
 
 	public $table;
 	public $primary_key;
-	public $default_limit	 = 15;
+	public $default_limit	 = 10;
 	public $page_links;
 	public $query;
 	public $form_values	 = array();
@@ -181,30 +181,46 @@ class MY_Model extends CI_Model {
 	 * no predefined table or default methods
 	 * $this->model_name->paginate()
 	 */
-	public function paginate_bot($exclude_methods = array(), $rows_x_page)
+	public function paginate_bot($exclude_methods = array(), $withAlias = false)
 	{
 		/**
 		 * Done with pagination, now on to the paged results
 		 */
 		$offset = uri_page();
-		$per_page = $rows_x_page;
+		$per_page = $this->default_limit;
 		$this->set_defaults($exclude_methods);
 		$this->db->limit($per_page, $offset);
-		$this->query = $this->db->get($this->table);
+		if ($withAlias)
+			$this->query = $this->db->get($this->table);
+		else
+			$this->query = $this->db->get($this->withoutAlias($this->table));
 		/* seteamos la creacion de links */
 		$uri_segment = '';
 
 		$this->load->helper('url');
 		$this->load->library('pagination');
+		// var_dump($this->db->last_query());
 
+		/* para usar este método de paginación, primero debes usar en tu select anterior */
+		/* la variante SQL_CALC_FOUND_ROWS después del select así */
+		/* "SELECT SQL_CALC_FOUND_ROWS col1, col2 FROM ..."  */
 		$this->total_rows = $this->db->query("select FOUND_ROWS() as total_rows")->row()->total_rows;
-		$uri_segments = $this->uri->segment_array();
-
+		// $uri_segments = $this->uri->segment_array();
+		// var_dump($uri_segments);
+		$uri_segments = segment_array_search();
+		// var_dump($uri_segments);
+		/*var_dump($uri_segments);
+		var_dump(implode('/', $uri_segments));exit;*/
+		// var_dump($uri_segments);exit;
+		// var_dump($uri_segments);exit;
 		foreach ($uri_segments as $key => $segment)
 		{
 			if ($segment == 'page')
 			{
-				$uri_segment = $key + 1;
+				// $uri_segment = $key + 1;
+				/* cuando usemos segment_array_search(ver arriba)  */
+				/* los indices devueltos empiezan en 0 no en 1 */
+				$uri_segment = $key + 2;
 				unset($uri_segments[$key], $uri_segments[$key + 1]);
 				$base_url = site_url(implode('/', $uri_segments) . '/page/');
 			}
@@ -240,6 +256,15 @@ class MY_Model extends CI_Model {
 		return $this->where($this->primary_key, $id)->get()->row();
 	}
 
+	protected function withoutAlias($table_name)
+	{
+		$table_name = trim(preg_replace('/\s+/', ' ', $table_name));
+		$parts = explode(' ', $table_name);
+		if (count($parts) > 1)
+			return $parts[0];
+		return $table_name;
+	}
+
 	public function save($id = NULL, $db_array = NULL, $set_flash_data = true)
 	{
 		if (!$db_array)
@@ -255,16 +280,10 @@ class MY_Model extends CI_Model {
 			}
 
 
-			$this->db->insert($this->table, $db_array);
+			$this->db->insert($this->withoutAlias($this->table), $db_array);
 			if ($set_flash_data)
 				$this->session->set_flashdata('alert_success', 'Agregado correctamente.');
-			if($this->db->insert_id() == ''){
-				if($this->db->_error_number() == 1062)
-					return 'duplicado';
-				//return $this->db->_error_number();
-			}
-			else
-				return $this->db->insert_id();
+			return $this->db->insert_id();
 		}
 		else
 		{
@@ -274,7 +293,7 @@ class MY_Model extends CI_Model {
 			}
 
 			$this->db->where($this->primary_key, $id);
-			$this->db->update($this->table, $db_array);
+			$this->db->update($this->withoutAlias($this->table), $db_array);
 			if ($set_flash_data)
 				$this->session->set_flashdata('alert_success', 'Actualizado correctamente.');
 
@@ -286,12 +305,18 @@ class MY_Model extends CI_Model {
 	 * Returns an array based on $_POST input matching the ruleset used to
 	 * validate the form submission.
 	 */
-	public function db_array()
+	public function db_array($validations = array())
 	{
 		$db_array = array();
 
-		$validation_rules = $this->{$this->validation_rules}();
-
+		if (empty($validations)) {
+			if (method_exists($this, $this->validation_rules))
+				$validation_rules = $this->{$this->validation_rules}();
+			else
+				$validation_rules = $this->{$this->default_validation_rules}();
+		}
+		else
+			$validation_rules = $validations;
 		foreach ($this->input->post() as $key => $value)
 		{
 			if (array_key_exists($key, $validation_rules))
@@ -310,8 +335,9 @@ class MY_Model extends CI_Model {
 	public function delete($id)
 	{
 		$this->db->where($this->primary_key, $id);
-		$this->db->delete($this->table);
-		//$this->session->set_flashdata('alert_success', 'Record successfully deleted.');
+		$this->db->delete($this->withoutAlias($this->table));
+		return $this->db->affected_rows();
+		// $this->session->set_flashdata('alert_success', 'Record successfully deleted.');
 	}
 
 	/**

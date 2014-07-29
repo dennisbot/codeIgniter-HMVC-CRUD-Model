@@ -1,0 +1,16 @@
+.container-login
+{
+	margin-top: 60px;
+}
+.login-form::before {
+	border-style: none;
+}
+footer {
+	text-align: center;
+}
+.login-form {
+	margin: 50px 0;
+}
+.row.fondo {
+	background-color: #1abc9c;
+}

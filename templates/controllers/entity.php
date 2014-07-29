@@ -27,7 +27,27 @@ class {controller_name} extends MX_Controller
             '{entity}s' => $this->{model_name}->paginate()->result(),
             'table_headers' => $this->{model_name_table}->get_table_headers()
         );
-
+        /* bootbox */
+        $this->template->add_js(public_url('bootstrap/bootbox/js/bootbox.min.js'));
+        /* custom js */
+        $this->template->add_js(public_url('activos/js/index.js'));
+        $css_inline = "
+            form {
+                float: right;
+                margin-bottom: 23px;
+            }
+        ";
+        $this->template->add_css($css_inline, "embed");
+        $this->template->write('header_title', 'Listado de activo');
+        $this->template->write('title', 'Listado de activo
+                               <a
+                               href="'.base_url('activo/toprint').'"
+                               target="_blank"
+                               class="btn btn-warning"
+                               style="float:right;padding: 6px 19px"
+                               id="imprimir"
+                               >
+                   <i class="icon-print icon-large"></i> Imprimir</a>');
         /*
          * assets
          */

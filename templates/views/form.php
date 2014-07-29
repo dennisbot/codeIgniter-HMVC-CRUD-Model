@@ -1,11 +1,23 @@
 <div class="padded form-agregar">
     <?php $this->load->view('dashboard/system_messages'); ?>
-    <form class="form-horizontal" method="post" id="form-{entity}" action="<?php echo site_url($this->uri->uri_string()); ?>">
+    <form class="form-horizontal" role="form" method="post" action="<?php echo site_url($this->uri->uri_string()); ?>">
+
         {fields_form}
-        <div class="control-group">
-            <div class="controls">
-                <input type="submit" class="btn btn-danger" name="btn_cancel" value="<?php echo $this->lang->line('cancel'); ?>" />
-                <input type="submit" class="btn btn-success" name="btn_submit" value="<?php echo $this->lang->line('submit'); ?>" />
+
+        <div class="form-group">
+            <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-sm-offset-4 col-sm-4">
+                        <input type="submit" class="btn btn-danger form-control" name="btn_cancel" value="<?php echo $this->lang->line('cancel'); ?>" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-sm-offset-4 col-sm-4">
+                        <input type="submit" class="btn btn-success form-control" name="btn_submit" value="<?php echo $this->lang->line('submit'); ?>" />
+                    </div>
+                </div>
             </div>
         </div>
     </form>

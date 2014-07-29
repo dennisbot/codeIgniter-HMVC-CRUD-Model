@@ -1,6 +1,6 @@
-<div class="centered-text" style="width: 60%; margin: 0px auto; padding: 15px;">
-<?php $this->load->view('dashboard/system_messages'); ?>
 <?php $this->load->view('dashboard/btn_add', array('btn_value'=> 'agregar {entity}')); ?>
+<div style="clear:both">
+<?php $this->load->view('dashboard/system_messages'); ?>
 </div>
 <table class="table table-striped table-hover form-agregar" style="margin: 0px auto;">
 	<tr>
@@ -16,10 +16,15 @@
 		<?php } ?>
 
 		<td>
-			<a href="<?php echo site_url('{entity}/form/{identity}/' . ${entity}->{identity}); ?>" title="<?php echo $this->lang->line('edit'); ?>">
+			<a href="<?php echo site_url('{entity}/form/{identity}/' . ${entity}->{identity}); ?>"
+                title="<?php echo $this->lang->line('edit'); ?>"
+            >
 			<?php echo icon('edit'); ?>
 			</a>
-			<a href="<?php echo site_url('{entity}/delete/{identity}/' . ${entity}->{identity}); ?>" title="<?php echo $this->lang->line('delete'); ?>" onclick="javascript:if(!confirm('<?php echo $this->lang->line('confirm_delete'); ?>')) return false">
+			<a href="<?php echo site_url('{entity}/delete/{identity}/' . ${entity}->{identity}); ?>"
+                title="<?php echo $this->lang->line('delete'); ?>"
+                class="delete-record"
+            >
 			<?php echo icon('delete'); ?>
 			</a>
 		</td>
@@ -28,9 +33,7 @@
 </table>
 <?php if ($this->mdl_{entity}->page_links) { ?>
     <div id="loading" style="position: relative"></div>
-        <div id="pagination" class="pagination pagination-centered">
-            <ul>
-                <?php echo $this->mdl_{entity}->page_links; ?>
-            </ul>
-        </div>
+        <ul class="pagination">
+            <?php echo $this->mdl_{entity}->page_links; ?>
+        </ul>
 <?php } ?>

@@ -1,5 +1,5 @@
 <?php if (function_exists('validation_errors') && validation_errors()) { ?>
-<div id="1box-errors" class="alert alert-error">
+<div id="1box-errors" class="alert alert-warning">
 	<button type="button" class="close" data-dismiss="alert">&times;</button>
 	<span>Por favor corrija los siguientes campos:</span>
 	<ul><?php echo validation_errors(); ?></ul>

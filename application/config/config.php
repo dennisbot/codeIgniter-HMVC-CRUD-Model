@@ -377,7 +377,7 @@ $config['proxy_ips'] = '';
 
 /* End of file config.php */
 /* Location: ./application/config/config.php */
-$config['results_per_page'] = 5;
+$config['results_per_page'] = 3;
 $config['pagination_style'] = array(
 	'next_link' => 'Siguiente >',
     'next_tag_open' => '<li>',

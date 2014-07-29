@@ -2,7 +2,6 @@
 
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
-
     function p($a) {
         echo '<pre>';
         print_r($a);
@@ -13,6 +12,29 @@ if (!defined('BASEPATH'))
         echo '<pre>';
         var_dump($a);
         echo '</pre>';
+    }
+    function toKeyValue($collection, $key, $value)
+    {
+        $array = array();
+        foreach ($collection as $item) {
+            $array[$item->$key] = $item->$value;
+        }
+        return $array;
+    }
+    function generar_params($from_tabla = '')
+    {
+        if ($from_tabla == '') die('no existe la tabla especificada');
+        $CI  = & get_instance();
+        $fields = $CI->db->query("show fields from $from_tabla");
+        $campos = $fields->result();
+        $handle = fopen($from_tabla . "_params.txt", "w");
+        foreach ($campos as $key => $value) {
+            $escribir = "\$params['p{$value->Field}'] = \$this->input->post('{$value->Field}');\n";
+            fwrite($handle, $escribir);
+        }
+        fclose($handle);
+        var_dump("escrito");
+        exit;
     }
 
     function IsNullOrEmptyString($question) {
@@ -65,6 +87,12 @@ if (!defined('BASEPATH'))
         $salt = "8kaW1cNqdqclNojmrlAZ1borBfEAqDdquN250PMtZDkpkbP4OEif4eIP8jW8JKF";
         return md5($string.$salt);
     }
+    function generar_clave($salt, $input)
+    {
+        $at = strpos($input, '@');
+        $toreverse = substr($input, 0, $at);
+        return sha1($salt . strrev($toreverse));
+    }
 
     //generacion de codigo de activacion
     function generar_codigo_activacion()
@@ -78,10 +106,17 @@ if (!defined('BASEPATH'))
         //return @MD5(uniqid(""));
         return 'foto_' . substr(@md5(uniqid(rand(), true)), 0, 16);
     }
-    function generar_nombre_evento()
+    function generar_nombre_servicio()
     {
         //return @MD5(uniqid(""));
-        return 'evento_' . substr(@md5(uniqid(rand(), true)), 0, 16);
+        return 'servicio_' . substr(@md5(uniqid(rand(), true)), 0, 16);
+    }
+    if (!function_exists('attrs')) {
+        function attrs($params = '')
+        {
+            $CI = &get_instance();
+            return $CI->config->item('language_attributes') . $params;
+        }
     }
     //generacion password para el pass perdido
     function generar_password()
@@ -96,40 +131,45 @@ if (!defined('BASEPATH'))
      */
     if ( ! function_exists('base_path'))
     {
-        function base_path()
+        function base_path($uri = '')
         {
             $CI =& get_instance();
-            return $CI->config->slash_item('base_path');
+            return $CI->config->slash_item('base_path') . ltrim($uri, '/');
         }
     }
-
+    if (!function_exists('file_uploader')) {
+        function file_uploader($uri = '') {
+            $CI = & get_instance();
+            return $CI->config->slash_item('file_uploader') . ltrim($uri, '/');
+        }
+    }
     /*
      * Bootstrap Assets
      */
     if ( ! function_exists('bootstrap_css'))
     {
-        function bootstrap_css()
+        function bootstrap_css($uri = '')
         {
             $CI =& get_instance();
-            return $CI->config->slash_item('bootstrap_css');
+            return $CI->config->slash_item('bootstrap_css') . ltrim($uri, '/');
         }
     }
 
     if ( ! function_exists('bootstrap_img'))
     {
-        function bootstrap_img()
+        function bootstrap_img($uri = '')
         {
             $CI =& get_instance();
-            return $CI->config->slash_item('bootstrap_img');
+            return $CI->config->slash_item('bootstrap_img') . ltrim($uri, '/');
         }
     }
 
     if ( ! function_exists('bootstrap_js'))
     {
-        function bootstrap_js()
+        function bootstrap_js($uri = '')
         {
             $CI =& get_instance();
-            return $CI->config->slash_item('bootstrap_js');
+            return $CI->config->slash_item('bootstrap_js') . ltrim($uri, '/');
         }
     }
 
@@ -138,133 +178,129 @@ if (!defined('BASEPATH'))
     */
     if ( ! function_exists('font_awesome_css'))
     {
-        function font_awesome_css()
+        function font_awesome_css($uri = '')
         {
             $CI =& get_instance();
-            return $CI->config->slash_item('font_awesome_css');
+            return $CI->config->slash_item('font_awesome_css') . ltrim($uri, '/');
         }
     }
 
     /*
-     * Apueventos Assets
+     * Apuservicios Assets
     */
     if ( ! function_exists('base_css'))
     {
-        function base_css()
+        function base_css($uri = '')
         {
             $CI =& get_instance();
-            return $CI->config->slash_item('base_css');
+            return $CI->config->slash_item('base_css') . ltrim($uri, '/');
         }
     }
 
     if ( ! function_exists('base_img'))
     {
-        function base_img()
+        function base_img($uri = '')
         {
             $CI =& get_instance();
-            return $CI->config->slash_item('base_img');
+            return $CI->config->slash_item('base_img') . ltrim($uri, '/');
         }
     }
 
     if ( ! function_exists('base_js'))
     {
-        function base_js()
+        function base_js($uri = '')
         {
             $CI =& get_instance();
-            return $CI->config->slash_item('base_js');
+            return $CI->config->slash_item('base_js') . ltrim($uri, '/');
         }
     }
 
     if ( ! function_exists('base_jquery'))
     {
-        function base_jquery()
+        function base_jquery($uri = '')
         {
             $CI =& get_instance();
-            return $CI->config->slash_item('base_jquery');
+            return $CI->config->slash_item('base_jquery') . ltrim($uri, '/');
         }
     }
 
     if ( ! function_exists('public_url'))
     {
-        function public_url()
+        function public_url($uri = '')
         {
             $CI =& get_instance();
-            return $CI->config->slash_item('public_url');
+            return $CI->config->slash_item('public_url') . ltrim($uri, '/');
         }
     }
 
-    if ( ! function_exists('base_url_foto_evento'))
+    if ( ! function_exists('base_url_foto_servicio'))
     {
-        function base_url_foto_evento()
+        function base_url_foto_servicio($uri = '')
         {
             $CI =& get_instance();
-            return $CI->config->slash_item('base_url_foto_evento');
+            return $CI->config->slash_item('base_url_foto_servicio') . ltrim($uri, '/');
         }
     }
 
-    if ( ! function_exists('base_url_foto_user'))
+    if ( ! function_exists('base_url_foto_servicio_thumb'))
     {
-        function base_url_foto_user()
+        function base_url_foto_servicio_thumb($uri = '')
         {
             $CI =& get_instance();
-            return $CI->config->slash_item('base_url_foto_user');
+            return $CI->config->slash_item('base_url_foto_servicio_thumb') . ltrim($uri, '/');
         }
     }
+
 
 
         if ( ! function_exists('base_url_foto_temp'))
     {
-        function base_url_foto_temp()
+        function base_url_foto_temp($uri = '')
         {
             $CI =& get_instance();
-            return $CI->config->slash_item('base_url_foto_temp');
+            return $CI->config->slash_item('base_url_foto_temp') . ltrim($uri, '/');
         }
     }
 
-    if ( ! function_exists('base_path_foto_evento'))
+    if ( ! function_exists('base_path_foto_servicio'))
     {
-        function base_path_foto_evento()
+        function base_path_foto_servicio($uri = '')
         {
             $CI =& get_instance();
-            return $CI->config->slash_item('base_path_foto_evento');
+            return $CI->config->slash_item('base_path_foto_servicio') . ltrim($uri, '/');
+        }
+    }
+    if ( ! function_exists('base_path_foto_servicio_thumb'))
+    {
+        function base_path_foto_servicio_thumb($uri = '')
+        {
+            $CI =& get_instance();
+            return $CI->config->slash_item('base_path_foto_servicio_thumb') . ltrim($uri, '/');
         }
     }
 
-    if ( ! function_exists('base_path_foto_user'))
+    if ( ! function_exists('base_path_foto_temp'))
     {
-        function base_path_foto_user()
+        function base_path_foto_temp($uri = '')
         {
             $CI =& get_instance();
-            return $CI->config->slash_item('base_path_foto_user');
+            return $CI->config->slash_item('base_path_foto_temp') . ltrim($uri, '/');
+        }
+    }
+    if (!function_exists('base_galeria')) {
+        function base_galeria($uri = '') {
+            $CI = & get_instance();
+            return $CI->config->item('base_galeria') . ltrim($uri, '/');
+        }
+    }
+    if ( ! function_exists('site_name')) {
+        function site_name()
+        {
+            $CI = & get_instance();
+            return $CI->config->item('site_name');
         }
     }
 
-        if ( ! function_exists('base_path_foto_temp'))
-    {
-        function base_path_foto_temp()
-        {
-            $CI =& get_instance();
-            return $CI->config->slash_item('base_path_foto_temp');
-        }
-    }
-        /*
-     * Configuraci�n del paginador
-    */
-    function paginador($url_base, $total_filas, $filas_x_pagina, $links, $uri)
-    {
-        $config['base_url'] = $url_base;
-        $config['total_rows'] = $total_filas;
-        $config['per_page'] = $filas_x_pagina;
-        $config['num_links'] = $links;
-        $config['uri_segment'] = $uri;
-        $config['first_link'] = "<<";
-        $config['last_link'] = ">>";
-        $config['next_link'] = ">";
-        $config['prev_link'] = "<";
-        $config['cur_tag_open'] = "<span class='current'>";
-        $config['cur_tag_close'] = "</span>";
-        return $config;
-    }
 
     function save_image_from_url($in_path, $out_path)
     {

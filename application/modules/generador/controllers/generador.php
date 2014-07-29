@@ -17,7 +17,6 @@ class Generador extends MX_Controller
         $this->load->library('form_validation');
         $this->template->add_css(base_css() . "generator.css");
     }
-
     function index()
     {
         /*var_dump($this->indent(json_encode(array('frutas' => array('platano', 'mandarina', 'queso')))));
@@ -71,7 +70,7 @@ class Generador extends MX_Controller
                     'views' => $path_entity . '/views/',
                     'controllers' => $path_entity . '/controllers/',
                     'assets' => array(
-                        'js' => 'assets/' . $this->entity_name . '/'
+                        'js' => 'assets/' . $this->entity_name . '/js/'
                     )
                 );
                 foreach ($this->mvc as $key => $value) {
@@ -105,6 +104,9 @@ class Generador extends MX_Controller
                 $this->create_view();
                 /* create assets js */
                 $this->create_assets_js();
+                /* create delete index.js */
+                $this->create_delete_js();
+                echo '<a href="'.base_url().'">Ir al inicio</a>';
             }
         }
 
@@ -287,13 +289,13 @@ class Generador extends MX_Controller
                 }
             }
             $req = $ok ? '*' : '';
-            $res .= $space8 . "<div class=\"control-group <?php echo form_error('$key') != '' ? 'error' : '';?>\">\n";
-            $res .= $space12 . "<label class=\"control-label\">$req $key </label>\n";
+            $res .= $space8 . "<div class=\"form-group <?php echo form_error('$key') != '' ? 'has-error has-feedback' : '';?>\">\n";
+            $res .= $space12 . "<label class=\"col-sm-3 control-label\" for=\"$key\">$req $key </label>\n";
             $content = "";
             switch ($field) {
                 case 'password' :
                 case 'text' :
-                    $content = $space16.'<input type="text" name="' . $key . '" value="<?php echo $this->mdl_' . $this->entity_name . '->form_value(\'' . $key . '\'); ?>" />';
+                    $content = $space16.'<input type="text" name="' . $key . '" id="'.$key.'" class="form-control" value="<?php echo $this->mdl_' . $this->entity_name . '->form_value(\'' . $key . '\'); ?>" />';
                     break;
                 case 'dropdown' :
                     $content = $space16.'<select name="' . $key . '">' . "\n" . '
@@ -304,7 +306,10 @@ class Generador extends MX_Controller
                     $content = $space16.'<textarea cols="26" rows="8" name="' . $key . '" id="' . $key . '"><?php echo $this->mdl_' . $this->entity_name . '->form_value(\'' . $key . '\'); ?></textarea>';
                     break;
             }
-            $res .= $space12 . "<div class=\"controls\">\n$content\n$space12</div>\n";
+            $content .= $space12 . "<?php if (form_error('$key') != ''): ?>\n
+                    <span class=\"glyphicon glyphicon-remove form-control-feedback\"></span>\n
+                <?php endif ?>";
+            $res .= $space12 . "<div class=\"col-sm-9\">\n$content\n$space12</div>\n";
             $res .= $space8 . "</div>\n";
         }
         return $res;
@@ -342,6 +347,26 @@ class Generador extends MX_Controller
         }
         write_file($this->mvc['assets']['js'] . 'validate_' . $this->entity_name . '.js', $content_asset_js);
     }
+
+    public function create_delete_js()
+    {
+        $js = "$(function() {
+    bootbox.setDefaults({locale: 'es'});
+    $('.delete-record').click(function() {
+        var that  = this;
+        bootbox.confirm('<center><h3>¿Estás seguro de eliminar este registro?</h3></center>', function(result) {
+            console.log('result: ', result);
+            if (result) {
+                window.location.href = that.href;
+            }
+        });
+        return false;
+    })
+});
+";
+        write_file($this->mvc['assets']['js'] . 'index.js', $js);
+    }
+
 
     function fexist($path)
     {

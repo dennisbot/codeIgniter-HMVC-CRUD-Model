@@ -1,0 +1,27 @@
+html, body {
+	height: 100%;
+}
+body {
+	background: #FAFAFA url('/assets/img/header_animado/bg_cat_bw.jpg') fixed;
+	padding-top: 51px;
+}
+.container-qente {
+	height: 100%;
+}
+footer {
+	text-align: center;
+}
+.navbar {
+  border-radius: 0;
+}
+.fondo-dashboard {
+	min-height: 100% !important;
+	background: #FFF;
+	/*zoom: 1;
+	filter: alpha(opacity=75);
+	opacity: 0.75;*/
+}
+.marca {
+	background: #FFF url(../img/logo_30.png) no-repeat right bottom;
+	background-size: 16%;
+}

@@ -16,7 +16,7 @@ Patches with tests welcomed! For guidance see the tests  </spec/unit/>. To submi
 License:
 This source file is subject to the BSD license bundled with this package.
 Available online: {@link http://www.opensource.org/licenses/bsd-license.php}
-If you did not receive a copy of the license, and are unable to obtain it, 
+If you did not receive a copy of the license, and are unable to obtain it,
 learn to use a search engine.
 
 */
@@ -24,11 +24,11 @@ learn to use a search engine.
 (function($){
 
 $.fn.editInPlace = function(options) {
-	
+
 	var settings = $.extend({}, $.fn.editInPlace.defaults, options);
 	assertMandatorySettingsArePresent(settings);
 	preloadImage(settings.saving_image);
-	
+
 	return this.each(function() {
 		var dom = $(this);
 		// This won't work with live queries as there is no specific element to attach this
@@ -36,7 +36,7 @@ $.fn.editInPlace = function(options) {
 		if (dom.data('editInPlace'))
 			return; // already an editor here
 		dom.data('editInPlace', true);
-		
+
 		new InlineEditor(settings, dom).init();
 	});
 };
@@ -45,6 +45,10 @@ $.fn.editInPlace = function(options) {
 /// Required Options: Either url or callback, so the editor knows what to do with the edited values.
 $.fn.editInPlace.defaults = {
 	url:				"", // string: POST URL to send edited content
+	isdatepicker:		false, // boolean: used if the input will be a datepicker
+	iscurrency:		false, // boolean: used if the input will be a currency type
+	isgrid:		false, // boolean: used to specify if the container is a table
+	inputClass:		'', // string: used to add to the input
 	bg_over:			"#ffc", // string: background color of hover of unactivated editor
 	bg_out:				"transparent", // string: background color on restore from hover
 	hover_class:		"",  // string: class added to root element during hover. Will override bg_over and bg_out
@@ -60,12 +64,12 @@ $.fn.editInPlace.defaults = {
 	select_text:		"Choose new value", // string: default text to show up in select box
 	select_options:		"", // string or array: Used if field_type is set to 'select'. Can be comma delimited list of options 'textandValue,text:value', Array of options ['textAndValue', 'text:value'] or array of arrays ['textAndValue', ['text', 'value']]. The last form is especially usefull if your labels or values contain colons)
 	text_size:			null, // integer: set cols attribute of text input, if field_type is set to text. Use CSS if possible though
-	
+
 	// Specifying callback_skip_dom_reset will disable all saving_* options
 	saving_text:		undefined, // string: text to be used when server is saving information. Example "Saving..."
 	saving_image:		"", // string: uses saving text specify an image location instead of text while server is saving
 	saving_animation_color: 'transparent', // hex color string, will be the color the pulsing animation during the save pulses to. Note: Only works if jquery-ui is loaded
-	
+
 	value_required:		false, // boolean: if set to true, the element will not be saved unless a value is entered
 	element_id:			"element_id", // string: name of parameter holding the id or the editable
 	update_value:		"update_value", // string: name of parameter holding the updated/edited value
@@ -74,9 +78,9 @@ $.fn.editInPlace.defaults = {
 	save_if_nothing_changed:	false,  // boolean: submit to function or server even if the user did not change anything
 	on_blur:			"save", // string: "save" or null; what to do on blur; will be overridden if show_buttons is true
 	cancel:				"", // string: if not empty, a jquery selector for elements that will not cause the editor to open even though they are clicked. E.g. if you have extra buttons inside editable fields
-	
+
 	// All callbacks will have this set to the DOM node of the editor that triggered the callback
-	
+
 	callback:			null, // function: function to be called when editing is complete; cancels ajax submission to the url param. Prototype: function(idOfEditor, enteredText, orinalHTMLContent, settingsParams, callbacks). The function needs to return the value that should be shown in the dom. Returning undefined means cancel and will restore the dom and trigger an error. callbacks is a dictionary with two functions didStartSaving and didEndSaving() that you can use to tell the inline editor that it should start and stop any saving animations it has configured. /* DEPRECATED in 2.1.0 */ Parameter idOfEditor, use $(this).attr('id') instead
 	callback_skip_dom_reset: false, // boolean: set this to true if the callback should handle replacing the editor with the new value to show
 	success:			null, // function: this function gets called if server responds with a success. Prototype: function(newEditorContentString)
@@ -96,14 +100,14 @@ var delegateExample = {
 	// return content to show in inplace editor
 	willOpenEditInPlace: function(aDOMNode, aSettingsDict) {},
 	didOpenEditInPlace: function(aDOMNode, aSettingsDict) {},
-	
+
 	// called while closing the editor
 	// return false to prevent the editor from closing
 	shouldCloseEditInPlace: function(aDOMNode, aSettingsDict, triggeringEvent) {},
 	// return value will be shown during saving
 	willCloseEditInPlace: function(aDOMNode, aSettingsDict) {},
 	didCloseEditInPlace: function(aDOMNode, aSettingsDict) {},
-	
+
 	missingCommaErrorPreventer:''
 };
 
@@ -117,31 +121,31 @@ function InlineEditor(settings, dom) {
 };
 
 $.extend(InlineEditor.prototype, {
-	
+
 	init: function() {
 		this.setDefaultTextIfNeccessary();
 		this.connectOpeningEvents();
 	},
-	
+
 	reinit: function() {
 		if (this.shouldDelayReinit)
 			return;
-		
+
 		this.triggerCallback(this.settings.postclose, /* DEPRECATED in 2.1.0 */ this.dom);
 		this.triggerDelegateCall('didCloseEditInPlace');
-		
+
 		this.markEditorAsInactive();
 		this.connectOpeningEvents();
 	},
-	
+
 	setDefaultTextIfNeccessary: function() {
 		if('' !== this.dom.html())
 			return;
-		
+
 		this.dom.html(this.settings.default_text);
 		this.didInsertDefaultText = true;
 	},
-	
+
 	connectOpeningEvents: function() {
 		var that = this;
 		this.dom
@@ -149,30 +153,37 @@ $.extend(InlineEditor.prototype, {
 			.bind('mouseleave.editInPlace', function(){ that.removeHoverEffect(); })
 			.bind('click.editInPlace', function(anEvent){ that.openEditor(anEvent); });
 	},
-	
+
 	disconnectOpeningEvents: function() {
 	 	// prevent re-opening the editor when it is already open
 		this.dom.unbind('.editInPlace');
 	},
-	
+
 	addHoverEffect: function() {
 		if (this.settings.hover_class)
 			this.dom.addClass(this.settings.hover_class);
 		else
 			this.dom.css("background-color", this.settings.bg_over);
 	},
-	
+
 	removeHoverEffect: function() {
 		if (this.settings.hover_class)
 			this.dom.removeClass(this.settings.hover_class);
-		else
-			this.dom.css("background-color", this.settings.bg_out);
+		else {
+			if (!this.settings.isgrid)
+				this.dom.css("background-color", this.settings.bg_out);
+			else {
+				/* 2 lineas agregada por bot */
+				bg = this.dom.closest('tr').hasClass('even') ? '#f9f9f9' : '#ffffff';
+				this.dom.css("background-color", bg);
+			}
+		}
 	},
-	
+
 	openEditor: function(anEvent) {
 		if ( ! this.shouldOpenEditor(anEvent))
-			return;
-		
+			return false;
+
 		this.disconnectOpeningEvents();
 		this.removeHoverEffect();
 		this.removeInsertedDefaultTextIfNeccessary();
@@ -183,136 +194,164 @@ $.extend(InlineEditor.prototype, {
 		this.workAroundMissingBlurBug();
 		this.connectClosingEventsToEditor();
 		this.triggerDelegateCall('didOpenEditInPlace');
+		// return false;
 	},
-	
+
 	shouldOpenEditor: function(anEvent) {
 		if (this.isClickedObjectCancelled(anEvent.target))
 			return false;
-		
+
 		if (false === this.triggerCallback(this.settings.preinit, /* DEPRECATED in 2.1.0 */ this.dom))
 			return false;
-		
+
 		if (false === this.triggerDelegateCall('shouldOpenEditInPlace', true, anEvent))
 			return false;
-		
+
 		return true;
 	},
-	
+
 	removeInsertedDefaultTextIfNeccessary: function() {
 		if ( ! this.didInsertDefaultText
 			|| this.dom.html() !== this.settings.default_text)
 			return;
-		
 		this.dom.html('');
 		this.didInsertDefaultText = false;
 	},
-	
+
 	isClickedObjectCancelled: function(eventTarget) {
 		if ( ! this.settings.cancel)
 			return false;
-		
+
 		var eventTargetAndParents = $(eventTarget).parents().andSelf();
 		var elementsMatchingCancelSelector = eventTargetAndParents.filter(this.settings.cancel);
 		return 0 !== elementsMatchingCancelSelector.length;
 	},
-	
+
 	saveOriginalValue: function() {
 		if (this.settings.use_html)
 			this.originalValue = this.dom.html();
 		else
 			this.originalValue = trim(this.dom.text());
 	},
-	
+
 	restoreOriginalValue: function() {
 		this.setClosedEditorContent(this.originalValue);
 	},
-	
+
 	setClosedEditorContent: function(aValue) {
 		if (this.settings.use_html)
 			this.dom.html(aValue);
 		else
 			this.dom.text(aValue);
 	},
-	
+
 	workAroundMissingBlurBug: function() {
 		// Strangely, all browser will forget to send a blur event to an input element
-		// when another one is created and selected programmatically. (at least under some circumstances). 
-		// This means that if another inline editor is opened, existing inline editors will _not_ close 
+		// when another one is created and selected programmatically. (at least under some circumstances).
+		// This means that if another inline editor is opened, existing inline editors will _not_ close
 		// if they are configured to submit when blurred.
-		
+
 		// Using parents() instead document as base to workaround the fact that in the unittests
 		// the editor is not a child of window.document but of a document fragment
 		var ourInput = this.dom.find(':input');
 		this.dom.parents(':last').find('.editInPlace-active :input').not(ourInput).blur();
 	},
-	
+
 	replaceContentWithEditor: function() {
 		var buttons_html  = (this.settings.show_buttons) ? this.settings.save_button + ' ' + this.settings.cancel_button : '';
 		var editorElement = this.createEditorElement(); // needs to happen before anything is replaced
 		/* insert the new in place form after the element they click, then empty out the original element */
-		this.dom.html('<form class="inplace_form" style="display: inline; margin: 0; padding: 0;"></form>')
+		this.dom.html('<form class="inplace_form form-inline" style="display: inline; margin: 0; padding: 0;"></form>')
 			.find('form')
 				.append(editorElement)
 				.append(buttons_html);
 	},
-	
+
 	createEditorElement: function() {
 		if (-1 === $.inArray(this.settings.field_type, ['text', 'textarea', 'select']))
 			throw "Unknown field_type <fnord>, supported are 'text', 'textarea' and 'select'";
-		
+
 		var editor = null;
 		if ("select" === this.settings.field_type)
 			editor = this.createSelectEditor();
 		else if ("text" === this.settings.field_type)
-			editor = $('<input type="text" ' + this.inputNameAndClass() 
+			editor = $('<input type="text" ' + this.inputNameAndClass()
 				+ ' size="' + this.settings.text_size  + '" />');
 		else if ("textarea" === this.settings.field_type)
-			editor = $('<textarea ' + this.inputNameAndClass() 
+			editor = $('<textarea ' + this.inputNameAndClass()
 				+ ' rows="' + this.settings.textarea_rows + '" '
 				+ ' cols="' + this.settings.textarea_cols + '" />');
-		
+		if (this.settings.isdatepicker) {
+		  var that = this;
+		  editor.datepicker({
+		  	language: 'es',
+	        minViewMode: 'days',
+	        autoclose: true,
+	        todayHighlight: true,
+	        forceParse: false,
+	        format: 'dd/mm/yyyy'
+		  }).on('changeDate', function(e) {
+		  	that.handleSaveEditor(e);
+			return false; // stop event bubbling
+		  }).on('hide', function(e) {
+		  	that.handleSaveEditor(e);
+			return false; // stop event bubbling
+		  });
+		}
+		else {
+			if (this.settings.iscurrency) {
+				editor.maskMoney({
+			      precision: 2,
+			      defaultZero: true,
+			      allowZero: true,
+			      thousands: ' ',
+			      decimal: '.'
+			    });
+			}
+		}
 		return editor;
 	},
-	
+
 	setInitialValue: function() {
 		var initialValue = this.triggerDelegateCall('willOpenEditInPlace', this.originalValue);
 		var editor = this.dom.find(':input');
 		editor.val(initialValue);
-		
+
 		// Workaround for select fields which don't contain the original value.
 		// Somehow the browsers don't like to select the instructional choice (disabled) in that case
 		if (editor.val() !== initialValue)
 			editor.val(''); // selects instructional choice
 	},
-	
+
 	inputNameAndClass: function() {
-		return ' name="inplace_value" class="inplace_field" ';
+		if (this.settings.inputClass != '') this.settings.inputClass = ' ' + this.settings.inputClass;
+		return ' name="inplace_value" class="inplace_field form-control' + this.settings.inputClass + '" ';
 	},
-	
+
 	createSelectEditor: function() {
 		var editor = $('<select' + this.inputNameAndClass() + '>'
 			+	'<option disabled="true" value="">' + this.settings.select_text + '</option>'
 			+ '</select>');
-		
+
 		var optionsArray = this.settings.select_options;
 		if ( ! $.isArray(optionsArray))
 			optionsArray = optionsArray.split(',');
-		
+
 		for (var i=0; i<optionsArray.length; i++) {
 			var currentTextAndValue = optionsArray[i];
 			if ( ! $.isArray(currentTextAndValue))
 				currentTextAndValue = currentTextAndValue.split(':');
-			
+
 			var value = trim(currentTextAndValue[1] || currentTextAndValue[0]);
 			var text = trim(currentTextAndValue[0]);
-			
+
 			var option = $('<option>').val(value).text(text);
 			editor.append(option);
 		}
-		
+
 		return editor;
 	},
-	
+
 	connectClosingEventsToEditor: function() {
 		var that = this;
 		function cancelEditorAction(anEvent) {
@@ -323,117 +362,132 @@ $.extend(InlineEditor.prototype, {
 			that.handleSaveEditor(anEvent);
 			return false; // stop event bubbling
 		}
-		
+
 		var form = this.dom.find("form");
-		
+
 		form.find(".inplace_field").focus().select();
 		form.find(".inplace_cancel").click(cancelEditorAction);
 		form.find(".inplace_save").click(saveEditorAction);
-		
+
+
 		if ( ! this.settings.show_buttons) {
-				// TODO: Firefox has a bug where blur is not reliably called when focus is lost 
+				// TODO: Firefox has a bug where blur is not reliably called when focus is lost
 				//       (for example by another editor appearing)
-			if ("save" === this.settings.on_blur)
-				form.find(".inplace_field").blur(saveEditorAction);
+			if ("save" === this.settings.on_blur) {
+				if (!this.settings.isdatepicker)
+					form.find(".inplace_field").blur(saveEditorAction);
+			}
 			else
 				form.find(".inplace_field").blur(cancelEditorAction);
-			
+
 			// workaround for msie & firefox bug where it won't submit on enter if no button is shown
-			if ($.browser.mozilla || $.browser.msie)
-				this.bindSubmitOnEnterInInput();
+			/* deprecated */
+			/*if ($.browser.mozilla || $.browser.msie)
+				this.bindSubmitOnEnterInInput();*/
 		}
-		
+
 		form.keyup(function(anEvent) {
 			// allow canceling with escape
 			var escape = 27;
 			if (escape === anEvent.which)
 				return cancelEditorAction();
 		});
-		
+
 		// workaround for webkit nightlies where they won't submit at all on enter
 		// REFACT: find a way to just target the nightlies
-		if ($.browser.safari)
-			this.bindSubmitOnEnterInInput();
-		
-		
+		/*if ($.browser.safari)
+			this.bindSubmitOnEnterInInput();*/
+
+
 		form.submit(saveEditorAction);
 	},
-	
+
 	bindSubmitOnEnterInInput: function() {
 		if ('textarea' === this.settings.field_type)
 			return; // can't enter newlines otherwise
-		
+
 		var that = this;
+		return;
 		this.dom.find(':input').keyup(function(event) {
 			var enter = 13;
 			if (enter === event.which)
 				return that.dom.find('form').submit();
 		});
-	 	
+
 	},
-	
+
 	handleCancelEditor: function(anEvent) {
+		/* para probar los estilos detenemos la restauración de input a div normal */
+		/* dennisbot */
+		// return false;
+
+		if (this.settings.isdatepicker) return;
+
 		// REFACT: remove duplication between save and cancel
 		if (false === this.triggerDelegateCall('shouldCloseEditInPlace', true, anEvent))
 			return;
-		
+
 		var enteredText = this.dom.find(':input').val();
 		enteredText = this.triggerDelegateCall('willCloseEditInPlace', enteredText);
-		
+
 		this.restoreOriginalValue();
-		if (hasContent(enteredText) 
+		if (hasContent(enteredText)
 			&& ! this.isDisabledDefaultSelectChoice())
 			this.setClosedEditorContent(enteredText);
 		this.reinit();
 	},
-	
+
 	handleSaveEditor: function(anEvent) {
 		if (false === this.triggerDelegateCall('shouldCloseEditInPlace', true, anEvent))
 			return;
-		
 		var enteredText = this.dom.find(':input').val();
 		enteredText = this.triggerDelegateCall('willCloseEditInPlace', enteredText);
-		
+		var dev = this.isDisabledDefaultSelectChoice();
+
 		if (this.isDisabledDefaultSelectChoice()
 			|| this.isUnchangedInput(enteredText)) {
 			this.handleCancelEditor(anEvent);
+			if (this.settings.isdatepicker) {
+				this.restoreOriginalValue();
+				this.reinit();
+			}
 			return;
 		}
-		
+
 		if (this.didForgetRequiredText(enteredText)) {
 			this.handleCancelEditor(anEvent);
 			this.reportError("Error: You must enter a value to save this field");
 			return;
 		}
-		
+
 		this.showSaving(enteredText);
-		
+
 		if (this.settings.callback)
 			this.handleSubmitToCallback(enteredText);
 		else
 			this.handleSubmitToServer(enteredText);
 	},
-	
+
 	didForgetRequiredText: function(enteredText) {
-		return this.settings.value_required 
-			&& ("" === enteredText 
+		return this.settings.value_required
+			&& ("" === enteredText
 				|| undefined === enteredText
 				|| null === enteredText);
 	},
-	
+
 	isDisabledDefaultSelectChoice: function() {
 		return this.dom.find('option').eq(0).is(':selected:disabled');
 	},
-	
+
 	isUnchangedInput: function(enteredText) {
 		return ! this.settings.save_if_nothing_changed
 			&& this.originalValue === enteredText;
 	},
-	
+
 	showSaving: function(enteredText) {
 		if (this.settings.callback && this.settings.callback_skip_dom_reset)
 			return;
-		
+
 		var savingMessage = enteredText;
 		if (hasContent(this.settings.saving_text))
 			savingMessage = this.settings.saving_text;
@@ -442,13 +496,13 @@ $.extend(InlineEditor.prototype, {
 			savingMessage = $('<img />').attr('src', this.settings.saving_image).attr('alt', savingMessage);
 		this.dom.html(savingMessage);
 	},
-	
+
 	handleSubmitToCallback: function(enteredText) {
 		// REFACT: consider to encode enteredText and originalHTML before giving it to the callback
 		this.enableOrDisableAnimationCallbacks(true, false);
-		var newHTML = this.triggerCallback(this.settings.callback, /* DEPRECATED in 2.1.0 */ this.id(), enteredText, this.originalValue, 
+		var newHTML = this.triggerCallback(this.settings.callback, /* DEPRECATED in 2.1.0 */ this.id(), enteredText, this.originalValue,
 			this.settings.params, this.savingAnimationCallbacks());
-		
+
 		if (this.settings.callback_skip_dom_reset)
 			; // do nothing
 		else if (undefined === newHTML) {
@@ -459,20 +513,20 @@ $.extend(InlineEditor.prototype, {
 		else
 			// REFACT: use setClosedEditorContent
 			this.dom.html(newHTML);
-		
+
 		if (this.didCallNoCallbacks()) {
 			this.enableOrDisableAnimationCallbacks(false, false);
 			this.reinit();
 		}
 	},
-	
+
 	handleSubmitToServer: function(enteredText) {
-		var data = this.settings.update_value + '=' + encodeURIComponent(enteredText) 
-			+ '&' + this.settings.element_id + '=' + this.dom.attr("id") 
+		var data = this.settings.update_value + '=' + encodeURIComponent(enteredText)
+			+ '&' + this.settings.element_id + '=' + this.dom.attr("id")
 			+ ((this.settings.params) ? '&' + this.settings.params : '')
 			+ '&' + this.settings.original_html + '=' + encodeURIComponent(this.originalValue) /* DEPRECATED in 2.2.0 */
 			+ '&' + this.settings.original_value + '=' + encodeURIComponent(this.originalValue);
-		
+
 		this.enableOrDisableAnimationCallbacks(true, false);
 		this.didStartSaving();
 		var that = this;
@@ -486,7 +540,7 @@ $.extend(InlineEditor.prototype, {
 			},
 			success: function(html){
 				var new_text = html || that.settings.default_text;
-				
+
 				/* put the newly updated info into the original element */
 				// FIXME: should be affected by the preferences switch
 				that.dom.html(new_text);
@@ -505,47 +559,47 @@ $.extend(InlineEditor.prototype, {
 			}
 		});
 	},
-	
+
 	// Utilities .........................................................
-	
+
 	triggerCallback: function(aCallback /*, arguments */) {
 		if ( ! aCallback)
 			return; // callback wasn't specified after all
-		
+
 		var callbackArguments = Array.prototype.slice.call(arguments, 1);
 		return aCallback.apply(this.dom[0], callbackArguments);
 	},
-	
+
 	/// defaultReturnValue is only used if the delegate returns undefined
 	triggerDelegateCall: function(aDelegateMethodName, defaultReturnValue, optionalEvent) {
 		// REFACT: consider to trigger equivalent callbacks automatically via a mapping table?
 		if ( ! this.settings.delegate
 			|| ! $.isFunction(this.settings.delegate[aDelegateMethodName]))
 			return defaultReturnValue;
-		
+
 		var delegateReturnValue =  this.settings.delegate[aDelegateMethodName](this.dom, this.settings, optionalEvent);
 		return (undefined === delegateReturnValue)
 			? defaultReturnValue
 			: delegateReturnValue;
 	},
-	
+
 	reportError: function(anErrorString) {
 		this.triggerCallback(this.settings.error_sink, /* DEPRECATED in 2.1.0 */ this.id(), anErrorString);
 	},
-	
+
 	// REFACT: this method should go, callbacks should get the dom node itself as an argument
 	id: function() {
 		return this.dom.attr('id');
 	},
-	
+
 	markEditorAsActive: function() {
 		this.dom.addClass('editInPlace-active');
 	},
-	
+
 	markEditorAsInactive: function() {
 		this.dom.removeClass('editInPlace-active');
 	},
-	
+
 	// REFACT: consider rename, doesn't deal with animation directly
 	savingAnimationCallbacks: function() {
 		var that = this;
@@ -554,38 +608,38 @@ $.extend(InlineEditor.prototype, {
 			didEndSaving: function() { that.didEndSaving(); }
 		};
 	},
-	
+
 	enableOrDisableAnimationCallbacks: function(shouldEnableStart, shouldEnableEnd) {
 		this.didStartSaving.enabled = shouldEnableStart;
 		this.didEndSaving.enabled = shouldEnableEnd;
 	},
-	
+
 	didCallNoCallbacks: function() {
 		return this.didStartSaving.enabled && ! this.didEndSaving.enabled;
 	},
-	
+
 	assertCanCall: function(methodName) {
 		if ( ! this[methodName].enabled)
 			throw new Error('Cannot call ' + methodName + ' now. See documentation for details.');
 	},
-	
+
 	didStartSaving: function() {
 		this.assertCanCall('didStartSaving');
 		this.shouldDelayReinit = true;
 		this.enableOrDisableAnimationCallbacks(false, true);
-		
+
 		this.startSavingAnimation();
 	},
-	
+
 	didEndSaving: function() {
 		this.assertCanCall('didEndSaving');
 		this.shouldDelayReinit = false;
 		this.enableOrDisableAnimationCallbacks(false, false);
 		this.reinit();
-		
+
 		this.stopSavingAnimation();
 	},
-	
+
 	startSavingAnimation: function() {
 		var that = this;
 		this.dom
@@ -596,13 +650,13 @@ $.extend(InlineEditor.prototype, {
 				setTimeout(function(){ that.startSavingAnimation(); }, 10);
 			});
 	},
-	
+
 	stopSavingAnimation: function() {
 		this.dom
 			.stop(true)
 			.css({backgroundColor: ''});
 	},
-	
+
 	missingCommaErrorPreventer:''
 });
 
@@ -614,7 +668,7 @@ function assertMandatorySettingsArePresent(options) {
 	// one of these needs to be non falsy
 	if (options.url || options.callback)
 		return;
-	
+
 	throw new Error("Need to set either url: or callback: option for the inline editor to work.");
 }
 
@@ -622,7 +676,7 @@ function assertMandatorySettingsArePresent(options) {
 function preloadImage(anImageURL) {
 	if ('' === anImageURL)
 		return;
-	
+
 	var loading_image = new Image();
 	loading_image.src = anImageURL;
 }
@@ -636,10 +690,10 @@ function trim(aString) {
 function hasContent(something) {
 	if (undefined === something || null === something)
 		return false;
-	
+
 	if (0 === something.length)
 		return false;
-	
+
 	return true;
 }
 
